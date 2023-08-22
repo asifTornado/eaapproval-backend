@@ -1,0 +1,174 @@
+<div id="app" class="flex flex-col  w-screen h-screen px-20 py-10">
+
+
+<div class="overflow-y-scroll h-80 w-full relative px-5" v-if="addDepartmentCheck == false && updateItemCheck == false"><table   id="table" class="w-full text-start text-sm table-auto overflow-y-scroll w-full h-1/3" >
+	<thead class="shadow-inner shadow-sm shadow-gray-300 ">
+		<tr class="bg-blue-500 text-white">
+			<th scope="col" class="border-b border-b-slate-100  font-bold h-14 text-center mr-10 text-sm bg-blue-500 sticky top-0 text-white">Name</th>
+			<th class="bg-blue-500 sticky top-0 text-white"></th>
+			<th class="bg-blue-500 sticky top-0 text-white"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-for="department in status" :key="department._id" v-if="!department.email" scope="row"  class="shadow-inner shadow-sm shadow-gray-300" > 
+          <td class="border-b text-sm text-center border-b-slate-100 h-14 mr-10">\{{department.name}}</td>
+		  
+		  <td class="border-b text-sm text-center border-b-slate-100 h-14 w-1"> <button @click="$update(department)" style="cursor:pointer" class="fa-solid fa-pen rounded-md  font-bold text-emerald-500 text-center"></button></td>
+		  <td class="border-b text-sm text-center border-b-slate-100 h-14 w-1"><button @click="udelete(department)" style="cursor:pointer" class="fa-solid fa-trash rounded-md  font-bold text-center text-rose-500 ml-10 mr-5"></button></td>
+		</tr>
+</tbody>
+</table></div>
+
+
+
+
+{{!-- UpdateForm --}}
+ <div v-if="updateItemCheck == true" class=" bg-white w-full h-full flex flex-col justify-center items-center" >
+      <form @submit.prevent="updateDepartment" class="flex flex-col w-96 h-1/2 shadow-2xl shadow-dark  justify-center px-5 ">
+        <label class="w-full text-xl">Name</label>
+        <input v-model="updateItem.name" required class="h-8 border border-gray-400 border-solid mb-3 hover:border hover:border-blue-500 hover:border-2">
+        <br>
+     <div class="flex flex-col items-center justify-center">  
+        <button type="submit" class="bg-emerald-500 w-5/6 text-white font-bold text-xl h-8 rounded-sm hover:border mb-1 hover:border-blue hover:border-2">Update</button>
+		<button @click="dReturn" class="bg-gray-300 w-5/6 text-gray-500 font-bold text-xl h-8  rounded-sm ">Return</button></div>
+      </form>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+	{{!-- add user --}}
+<div  class=" bg-white w-full h-full flex flex-col justify-center items-center" v-if="addDepartmentCheck == true" id="addDepartmentForm">
+      <form @submit.prevent="addDepartment" class="flex flex-col w-96 h-1/2 shadow-2xl shadow-dark  justify-center px-5 ">
+
+        <label class="w-full text-xl">Name</label>
+        <input v-model="addDepartmentItem.name" required class="h-8 border border-gray-400 border-solid mb-3 hover:border hover:border-blue-500 hover:border-2">
+        
+        <div class="flex flex-col items-center justify-center"><button type="submit" class="bg-emerald-500 w-5/6 text-white font-bold text-xl h-8 rounded-sm hover:border mb-1 hover:border-blue hover:border-2">Add</button>
+		<button @click="dReturn" class="bg-gray-300 w-5/6 text-gray-500 font-bold text-xl h-8  rounded-sm ">Return</button></div>
+      </form>
+    </div>
+
+
+
+
+
+
+<div class="flex flex-row justify-end items-center w-full  mt-10 " v-if="addDepartmentCheck == false && updateItemCheck == false">
+	<Button @click="add"  class="bg-blue-500 w-36   text-white font-bold text-md h-14 ml-3 rounded-sm mr-2" v-if="addDepartmentCheck == false && updateItemCheck == false">Add Group</Button>
+	<Button onclick="location.href='/admin'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm  " >Home</Button>
+	
+</div>
+	
+
+
+
+
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+<script >
+  var vm = new Vue({
+	el:'#app',
+	data:{
+	    update:false,
+		status:[],
+		updateItem:null,
+		addCheck:false,
+		addDepartmentItem:{name:null, email:null},
+		addButton:true,
+		addDepartmentCheck:false,
+		updateItemCheck:false
+
+	},
+	created:function(){
+		this.loadQuote();
+	},
+	methods:{
+		loadQuote:function(){
+			
+			var vm = this;
+			axios.get("/getGroups").then(function(response){
+			    vm.status = response.data;
+				console.log(response.data)}
+				
+			).catch(function(error){
+			   console.log(error);
+			})
+		},
+		udelete:function(user){ 
+			var vm = this;
+			axios.post('/deleteGroup', user).then((response) => {console.log(response);
+		vm.loadQuote();
+		}, (error) => {console.log(error);});
+		},
+
+		$update:function(item){
+			this.updateItem = Object.assign({}, item);
+			this.updateItemCheck = true;
+		
+
+		},
+		updateDepartment:function(){
+			var vm = this;
+			axios.post('/updateGroup', vm.updateItem ).then((response)=>{
+				console.log(response);
+				vm.loadQuote();
+				vm.updateItem = null;
+				vm.addButton = true;
+				vm.updateItemCheck = false;
+			}, (error)=>{
+				console.log(error);
+			});
+		},
+		add:function(){
+		  this.addDepartmentItem = {name:null}
+		  this.addDepartmentCheck = true
+            
+		},
+		addDepartment:function(){
+			var vm = this;
+			axios.post('/insertGroup', vm.addDepartmentItem).then((response)=>{
+				console.log(response);
+				vm.loadQuote();
+				vm.addDepartmentItem = null;
+				vm.addButton = true;
+				vm.addDepartmentCheck = false;
+			}, (error)=>{
+				console.log(error);
+			});
+		},
+		reset:function(){
+			this.updateItem = null;
+			this.addButton = true;
+			this.addDepartmentItem = null
+		},
+		dReturn(){
+		  this.addDepartmentCheck = false;
+		  this.updateItemCheck = false;
+		}
+
+
+	}
+  })
+</script>

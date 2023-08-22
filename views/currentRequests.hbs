@@ -1,0 +1,663 @@
+<div id="app" class="flex flex-col justify-between items-stretch w-full h-full px-10">
+
+<div  v-if="showRequestCheck==false" class="flex flex-col">
+
+ <div class="flex flex-row mb-3 mt-5 ">
+
+
+    
+    
+    
+
+        
+    
+    <label for="requestType" class="mr-3 text-md font-semibold">Request Type</label>
+     <select type="text" v-model='requestType' id="requestType" class="mr-10 border border-black border-solid rounded-sm text-center w-24">
+      <option value="All">All</option>
+      <option :value="requestType" v-for="(requestType, requestTypeCounter) in requestTypes" :key="requestTypeCounter"> \{{requestType}} </option>
+
+    </select>
+
+    
+
+    <label for="id" class="mr-3 text-md font-semibold">id</label>
+    <input type="text" v-model='id' id="id" class="mr-10 border border-black border-solid rounded-sm text-center w-24">
+
+    
+    
+
+    <label for="email" class="mr-3 text-md font-semibold">email</label>
+    <select type="text" v-model='email' id="email" class="mr-10 border border-black border-solid rounded-sm text-center w-24">
+      <option value="All">All</option>
+      <option :value="email" v-for="(email, emailCounter) in emails">\{{email}}</option>
+    </select>
+
+    
+
+        
+    <label for="designation" class="mr-3 text-md font-semibold">designation</label>
+    <input type="text" v-model='designation' id="designation" class="mr-10 border border-black border-solid rounded-sm text-center w-24">
+
+    
+
+
+        
+    <label for="department" class=" text-md font-semibold">department</label>
+       <select type="department" v-model='department' id="department" class="mr-10 border border-black border-solid rounded-sm text-center w-24">
+      <option value="All">All</option>
+      <option :value="department" v-for="(department, departmentCounter) in departments">\{{department}}</option>
+    </select>
+
+  
+
+</div>
+
+
+<div class="flex flex-row mb-10">
+       <label for="" class="mr-3 font-semibold">Date</label>
+       <select name="" id="" v-model="timeRange" class="mr-3 h-6">
+        <option value="All">All</option>
+          <option value="on">On</option>
+          <option value="after">After</option>
+          <option value="before">Before</option>
+          <option value="between">Between</option> 
+       </select>
+    
+       <input type="date" v-if="timeRange == 'on'" class="mr-3 h-6" v-model="timeRangeOn"/>
+       <input type="date" v-else-if="timeRange == 'after'" class="mr-3 h-6" v-model="timeRangeAfter"/>
+       <input type="date" v-else-if="timeRange == 'before'" class="mr-3 h-6" v-model="timeRangeBefore"/>
+       <div type="date" v-else-if="timeRange == 'between'" class="flex flew-row" class="mr-3 h-6">
+        <input type="date" v-model="timeRangeBefore"/>
+        <p class="font-semibold ml-5 mr-5 mt-1" for="">and</p>
+        <input type="date" v-model="timeRangeAfter"/>
+       </div>       
+    
+        <button @click="filter()" class="h-9 rounded-sm bg-amber-500 text-white font-bold px-4 absolute right-20">Filter</button>
+</div>
+
+
+  <div class="w-full h-80 overflow-x-scroll overflow-y-scroll"><table class=" w-full">
+    <thead >
+        <tr class="bg-blue-500 text-white font-bold">
+            <th class="border border-slate-300  text-center pr-16 text-sm h-14">Name</th>
+            <th class="border border-slate-300  text-center pr-16 text-sm h-14">Time</th>
+            <th class="border border-slate-300  text-center pr-16 text-sm h-14">Designation</th>
+            <th class="border border-slate-300  text-center pr-16 text-sm h-14">Department</th>
+            <th class="border border-slate-300  text-center pr-16 text-sm h-14">email</th>
+            <th class="border border-slate-300  text-center pr-16 text-sm h-14"> Request Type</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="request in filteredRequests" style="cursor:pointer" @click="showRequest(request)" class="hover:cursor-pointer hover:bg-blue-200" >
+              <td class="border-b text-sm text-center border-slate-500 h-14 pr-16">\{{request.name}}</td>
+              <td class="border-b text-sm text-center border-slate-500 h-14 pr-16">\{{request.time}}</td>
+              <td class="border-b text-sm text-center border-slate-500 h-14 pr-16">\{{request.designation}}</td>
+              <td class="border-b text-sm text-center border-slate-500 h-14 pr-16">\{{request.department}}</td>
+              <td class="border-b text-sm text-center border-slate-500 h-14 pr-16">\{{request.email}}</td>
+              <td class="border-b text-sm text-center border-slate-500 h-14 pr-16">\{{request.requestType}}</td>
+              
+              
+        </tr>
+    </tbody>
+</table>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- start of showRequest  -->
+<div v-if="showRequestCheck == true" class="h-full w-full p-2">
+<h1 class="font-bold text-2xl text-center">\{{showRequestItem.requestType}}</h1>
+<table class="table-fixed w-full" >
+ <tr class="border border-slate-300 border-solid bg-blue-500 text-white font-bold"><td colspan="2" >Basic</td> </tr>
+<tr class="border border-slate-300 border-solid"><th class="border border-slate-300 border-solid text-start pl-20">Request Time</th><td class="text-start pl-20" >\{{showRequestItem.time}}</td></tr>
+<tr class="border border-slate-300 border-solid"><th class="border border-slate-300 border-solid text-start pl-20">Request Type</th><td class="text-start pl-20" >\{{showRequestItem.requestType}}</td></tr>
+<tr class="border border-slate-300 border-solid"><th class="border border-slate-300 border-solid text-start pl-20">Requester's Name</th><td class="text-start pl-20" >\{{showRequestItem.name}}</td></tr>
+<tr class="border border-slate-300 border-solid"><th class="border border-slate-300 border-solid text-start pl-20">Requester's Designation</th><td class="text-start pl-20" >\{{showRequestItem.designation}}</td></tr>
+<tr class="border border-slate-300 border-solid"><th class="border border-slate-300 border-solid text-start pl-20">Requester's Department</th><td class="text-start pl-20" >\{{showRequestItem.department}}</tr>
+
+
+
+</table>
+
+
+<table class="table-fixed w-full mt-10" id="show infos" v-if="showRequestItem.infos">
+    <tr><td colspan="2" class="border border-slate-300 border-solid bg-blue-500 text-white font-bold">Information </td> </tr>
+  <tr v-for="info in showRequestItem.infos" v-if="showRequestItem.infos.length > 0"  >
+    
+  <template v-if="info.dataType != 'list' && info.dataType != 'file'">
+    <th class="border border-slate-300 border-solid text-start p-5"> \{{info.name}}</th><td class="border border-slate-300 border-solid text-start pl-20"> \{{info.input}}</td>
+  </template>
+      <template v-else-if="info.dataType == 'file'">
+          <th class="border border-slate-300 border-solid text-start p-5"> \{{info.name}} </th>
+          <td class="border border-slate-300 border-solid text-start pl-20">
+
+
+                <div v-for="(file, inputCounter) in info.input" class="flex flex-row justify-between mb-1 p-1">
+                     <a target="_blank" :href="'/uploads/'+file.fileName">\{{file.originalName}}</a>
+                     <a target="_blank" :href="'/pdf/'+file.fileName" v-if="getFileType(file.fileName) == 'pdf'" class="p-1 ml-2 text-xs bg-green-500 text-white border border-black border-solid">Edit PDF </a>
+                     <a target="_blank" :href="'/image/'+file.fileName" v-else-if="getFileType(file.fileName) == 'image'" class="p-1 ml-2 text-xs bg-green-500 text-white border border-black border-solid">Edit Image </a>
+                </div>    
+          </td>
+      </template>
+  <td v-else colspan="2" class="border border-slate-300 border-solid text-start p-5">
+    <label for="" class="lead font-weight-bold">\{{info.name}}</label>
+ 
+     <table class="table-fixed w-full">
+      <thead>
+      <th v-for="answer in info.answerList" class="border border-slate-300 border-solid text-start p-5">
+         \{{answer.label}}
+      </th>
+      </thead>
+      <tbody>
+         <tr v-for="response in info.responses">
+           <td v-for="(value, key) in response" class="border border-slate-300 border-solid text-start p-5">
+            \{{value}}
+           </td>
+         </tr>
+
+      </tbody>
+    
+     </table>
+  
+
+  </td>
+    
+  </tr>
+</table>
+
+
+
+  {{!-- <div class="row" v-for="info in showRequestItem.infos" class="m-5">
+    <div class="col-md-12 font-weight-bold lead">
+     \{{info.label}}
+    </div>
+    <div class="col-md-12 ">
+       
+    </div>
+  </div> --}}
+
+<table class="table-fixed w-full mt-10" id="show extra infos" v-if="showRequestItem.extraInfos.length > 0">
+    <tr><td colspan="2"  class="border border-slate-300 border-solid bg-blue-500 text-white font-bold">Extra Information</td> </tr>
+  <tr v-for="info in showRequestItem.extraInfos"><th  class="border border-slate-300 border-solid text-start p-5"> \{{info.name}}</th><td  class="border border-slate-300 border-solid text-start p-5"> \{{info.input}}</td></tr>
+</table>
+
+  {{!-- <div class="row" v-for="info in showRequestItem.extraInfos">
+    <div class="col-md-12 font-weight-bold lead">
+     \{{info.label}}
+    </div>
+    <div class="col-md-12">
+        \{{info.input}}
+    </div>
+  </div> --}}
+
+
+  <div class="flex flex-row noprint w-full mt-10">
+    <div class=" font-weight-bold border border-slate-300 border-solid bg-blue-500 text-white font-bold w-1/6 flex flex-col justify-center items-center">
+     Comment
+    </div>
+    <div class="w-5/6 border border-solid border-black">
+     <textarea  v-model="showRequestItem.comment" class="w-full" rows="3" maxlength="500"></textarea>
+    </div>
+  </div>
+
+
+   <div class="row noprint flex flex-row mt-10">
+    <div class="font-weight-bold border border-slate-300 border-solid bg-blue-500 text-white font-bold w-1/6 flex flex-col justify-center items-center">
+     Upload Relevant Files
+    </div>
+    <div class="col-md-10 ">
+    <input type="file" class="form-control mb-2" placeholder="Upload Relevant File" ref="file" @change="uploadFile($event)" name="file"  multiple  />
+
+    <div v-for="(file, fileCounter) in files" class="flex flex-row justify-center items-center">
+            <label for="">\{{file.name}}</label>
+            <label for="">\{{file.size}}</label>
+            <label for="">\{{file.type}}</label>
+            <label for="" class="fa-solid fa-circle-minus fa-2xl" @click="removeFile(fileCounter)"></label>
+    </div>
+    </div>
+  </div>
+
+
+
+  <table v-if="showRequestItem.deferrals" class="table table-striped table-bordered mb-3 mt-10">
+    <thead>
+        <tr>
+            <th>Deferred By</th>
+            <th>Deferred To</th>
+            <th>Comment</th>
+         
+        </tr>
+        
+    </thead>
+    <tbody>
+        <tr v-for="(deferrer, counter) in showRequestItem.deferrals">
+            <td>\{{deferrer.deferredByEmail}}</td>
+            <td>\{{deferrer.deferredTo}}</td>
+             <td>\{{deferrer.deferrerComment}}</td>
+        </tr>
+    </tbody>
+  </table>
+
+  <table v-if="showRequestItem.approvals.length != 0" class="table w-full mt-10">
+    <thead>
+        <tr class="bg-blue-500 text-white font-bold">
+            
+            <th class="border border-slate-400 border-solid">Approver Name</th>
+            <th class="border border-slate-400 border-solid">Approver Email</th>
+            <th class="border border-slate-400 border-solid">Approver Id</th>
+            <th class="border border-slate-400 border-solid">Approver Designation</th>
+            <th class="border border-slate-400 border-solid">Status</th>
+            <th class="border border-slate-400 border-solid">Comment</th>
+            <th class="border border-slate-400 border-solid">Relevant Files</th>
+
+        </tr>
+        
+    </thead>
+    <tbody>
+        <tr v-for="(approver, counter) in showRequestItem.approvals">
+      
+            <td class="border border-solid border-slate-400">\{{approver.name}}</td>
+            <td class="border border-solid border-slate-400">\{{approver.email}}</td>
+            <td class="border border-solid border-slate-400">\{{approver.id}}</td>
+            <td class="border border-solid border-slate-400">\{{approver.designation}}</td>
+            <td class="border border-solid border-slate-400">\{{approver.status}}</td>
+            <td class="border border-solid border-slate-400">\{{approver.comment}}</td>
+            <td class="border border-solid border-slate-400"><div class="inline-block" v-for="(file, fileCounter) in approver.fileNames" v-if="approver.fileNames.length > 0"><a v-bind:href="'uploads/'+file.fileName"  target="_blank" @click.prevent="showFile">\{{file.originalName}}</a> <a :href="'pdf/'+file.fileName" class="h-auto px-2 bg-green-400  border border-black border-solid mr-3 text-xs text-white noprint" v-if="getFileType(file) == 'pdf'"  target="_blank" rel="noopener noreferrer">Edit Pdf</a><a v-bind:href="'image/'+file.fileName" class="h-auto px-2 bg-green-400  border border-black border-solid mr-3 text-xs text-white noprint" v-else-if="getFileType(file) == 'image'"  target="_blank" rel="noopener noreferrer">Edit Image</a> </div></td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+
+
+    <template v-for="(approver, approverCounter) in showRequestItem.approvals">
+         
+        <div class="border p2 mt-10 inline-block justify-center items-center" >
+          <div>
+            <img v-bind:src="'uploads/'+approver.signature" alt="No Uploaded Signature" class="w-32 h-28 mt-3">
+          </div>
+               <div class="flex flex-col justify-center items-center">
+                \{{approver.name}}
+               </div>
+        
+        
+        </div>
+     
+
+
+    </template>
+
+
+
+
+
+    <div class="flex flex-row" v-if="deferralsCheck == true">
+      <div class="bg-blue-500 text-white font-bold w-1/6 flex flex-col justify-center items-center">
+       Defer To
+      </div>
+      <div class="border border-black border-solid w-5/6">
+         <input type="text"  class="w-full" list="deferrers" v-model="deferredTo">
+          <datalist name="dataType"  required id="deferrers" >
+              
+              <option  v-for="deferrer in deferrals"> \{{deferrer.email}} </option>
+              
+                       
+          </datalist>
+      </div>
+    </div>
+ 
+
+
+<div v-if="userType == 'Approver' || userType == 'Admin'" class="mb-3 mt-3 noprint">
+<button @click="approve(showRequestItem)" class="bg-emerald-500 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg" v-if="deferralsCheck==false">Approve</button>
+<button @click="reject(showRequestItem)" v-if="deferralsCheck==false" class="bg-rose-500 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg">Reject</button>
+<button @click="addDeferral()" v-if="deferralsCheck==false" class="bg-yellow-500 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg">Add Deferral</button>
+<button @click="defer(showRequestItem)" v-if="deferralsCheck==true" class="bg-red-500 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg">Deferr</button>
+<button @click="dBack()" v-if="deferralsCheck==true" class="bg-slate-400 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg">Back</button>
+<button @click="rReturn" v-if="showRequestCheck==true" class="bg-slate-400 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg noprint absolute right-20">Return </button>
+</div>
+<div v-else-if="userType == 'Watcher'" class="mb-3 mt-3 noprint">
+<button @click="dBack()" v-if="deferralsCheck==true" class="bg-slate-400 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg">Back</button>
+</div>
+
+
+
+
+
+
+
+
+{{>discussions this}}
+
+</div>
+
+<div class="flex flex-row justify-end items-end mt-4 mb-10 w-full" v-if="showRequestCheck == false">
+  <button  v-if="userType != 'Admin'" onclick="location.href='/normal'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm ml-96" > Home</button>
+  <button v-else onclick="location.href='/admin'"class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm ml-96"> Home</button>
+  </div>
+
+
+
+
+<!-- end of show request -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <!-- end of app -->
+</div>
+
+
+<script>
+    var vm = new Vue({
+        mixins:[messageMixin],
+        el:"#app",
+        data:{
+            requests:null,
+            showRequestCheck:false,
+            showRequestItem:null,
+            userType:null,
+            deferrals:null,
+            deferredTo:"",
+            deferralsCheck:false,
+            files:[],
+            id:"All",
+            designation:"All",
+            department:"All",
+            requestType:"All",
+            email:"All",
+            filteredRequests:null,
+            urlId:'{{#if id}}{{id}}{{/if}}',
+            departments:[],
+            emails:[], 
+            requestTypes:[],
+            timeRange:null,
+            timeRangeBefore:null,
+            timeRangeAfter:null,
+            timeRangeOn:null
+     
+            
+       
+            
+        },
+
+        
+
+        created:function(){
+            this.loadRequests();
+            this.loadFilterVariables();
+       
+        
+          
+           
+            
+          
+        },
+
+        computed:{
+          name(){
+            var userNameElem = document.getElementById("userName");
+            var userName = userNameElem.innerHTML;
+            return userName
+          }
+        },
+        
+   
+  
+        methods:{
+            loadRequests(){
+                var vm = this;
+                axios.get("/getCurrentRequests").then((result)=>{
+                  vm.requests = result.data.requests; 
+                  vm.filteredRequests = result.data.requests; 
+                  vm.userType = result.data.userType;  
+                  console.log(result.data);
+               if(vm.urlId){
+                  vm.loadUrlItem(); 
+               }
+                  }
+                  ).catch((error)=>{console.log(error)})
+            },
+            showRequest(request){
+              
+
+                var vm = this;
+                this.showRequestCheck = true;
+                this.showRequestItem = request;
+                this.messages = this.showRequestItem.messages || [];
+
+                var id = request._id;
+                axios.post("/audit", {id:id}).then((result)=>{console.log(result);}).catch((error)=>{console.log(error);});
+
+            },
+            rReturn(){
+                this.showRequestCheck = false;
+                this.deferralsCheck = false;
+            },
+            approve(item){
+                var vm = this;
+                item.deferrals = null;
+                var data = new FormData();
+
+                for(let x = 0; x < this.files.length; x++){
+                     data.append("file", this.files[x])
+                }
+                
+                var itemString = JSON.stringify(item);
+                data.append("item", itemString)
+                console.log(item.deferrals)
+                console.log(data)
+                axios.post("/approve", data, { headers: {
+                "Content-Type": "multipart/form-data",
+              },}).then(async (result)=>{console.log(result);   vm.loadRequests(); }, (error)=>{console.log(error)});
+              
+                this.showRequestCheck = false;
+
+            },
+            reject(item){
+                var vm = this;
+                console.log("reject function activated");
+                item.deferrals = null;
+                axios.post("/reject", item).then((result)=>{console.log(result.data); vm.loadRequests(); this.showRequestCheck = false;}, (error)=>{console.log(error)});
+
+            },
+            addDeferral(){
+                var vm = this;
+                this.deferralsCheck = true;
+                console.log("from deferral");
+                axios.get("/getDeferredToUsers").then((result)=>{console.log(result.data); vm.deferrals = result.data;}).catch((error)=>{console.log(error)})
+
+            },
+            dBack(){
+                this.deferralsCheck = false;
+            },
+            defer(requestItem){
+                var vm = this;
+                var item = {item:requestItem, deferredEmail:this.deferredTo};
+                axios.post("/defer", item).then((result)=>{console.log(result); vm.loadRequests();}).catch((error)=>{console.log(error)});
+                this.deferralsCheck = false;
+                this.showRequestCheck = false;
+            },
+            showFile(event){
+              window.open(event.target.href, '_blank', 'height=600,width=800,resizable=yes,scrollbars=yes');
+            },
+            uploadFile(){
+              for(let x = 0; x < this.$refs.file.files.length; x++){
+                this.files.push(this.$refs.file.files[x])
+              }
+            
+            },
+            getFileType(fileName){
+              if(fileName){
+              var lastThree = fileName.slice(-3);
+              var lastFour = fileName.slice(-4);
+                   if(lastThree == "pdf"){
+                    return "pdf"
+                   }else if(lastThree == "png" || lastFour == "jpeg" || lastThree == "jpg" || lastThree == "JPG"){
+                    return "image"                    
+                   }
+
+              }else{
+                return false
+              }
+              
+             
+            },
+
+            removeFile(fileCounter){
+              this.files.splice(fileCounter, 1)
+              },
+
+              loadUrlItem(){
+                var vm = this;
+                 console.log(this.urlId)
+                
+                var filter = vm.requests.filter(function(request){
+                  return request._id == vm.urlId
+                })
+
+                this.showRequestItem = filter[0]
+
+                  this.showRequestCheck = true;
+                 },
+                  
+        
+
+
+             filter(){
+
+                var vm = this;
+
+                var filterList = [ {name:"id", value:this.id}, 
+                {name:"department", value:this.department}, {name:"designation", value:this.designation}, 
+                {name:"email", value:this.email}, {name:"requestType", value:this.requestType}, {name:"time", value:this.timeRange}];
+
+
+            
+
+
+
+
+
+               console.log("filter request")
+                console.log(filterList);
+                var mappedFilterList = filterList.map((data)=>{
+                    if(data.value != "All"){
+                        return data
+                    }else{
+                        return null
+                    }
+                });
+
+                console.log("mappedFilterList")
+                console.log(mappedFilterList)
+               
+
+               this.filteredRequests = this.requests.filter(function(request){
+                    console.log("entered main filter")
+                   for(let x=0; x < mappedFilterList.length; x++){
+                         console.log("value of mapped filter list")
+                         console.log(mappedFilterList[x])
+                         console.log(x)
+                         console.log("entered first loop")
+                 if(mappedFilterList[x] != null){
+                       console.log("entered first if")
+                    if(mappedFilterList[x].name != 'time'){
+                        console.log("entered first mappedfilterList")
+                        if((request[mappedFilterList[x].name] != mappedFilterList[x].value) ){
+                        return false
+                    }
+
+                    }else{
+                        console.log("entered second mappedfilterList")
+                        if(mappedFilterList[x].value == 'on'){
+                               console.log("entered on")
+                             request_Time = request[mappedFilterList[x].name]
+                             filter_Time = new Date(vm.timeRangeOn).toDateString()
+                             
+                             if(request_Time != filter_Time){
+                                console.log("request time")
+                                console.log(request_Time)
+                                console.log("filtered time")
+                                console.log(filter_Time)
+                                return false
+                             }
+
+                        }else if(mappedFilterList[x].value == "after"){
+                                   
+                            if( new Date(request[mappedFilterList[x].name]).getTime() < new Date(vm.timeRangeAfter).getTime()){
+                                return false
+                             }
+
+                        }else if(mappedFilterList[x].value == "before"){
+
+                            if( new Date(request[mappedFilterList[x].name]).getTime() > new Date(vm.timeRangeBefore).getTime()){
+                                return false
+                             }
+
+                        }else if(mappedFilterList[x].value == "between"){
+                            if( (new Date(request[mappedFilterList[x].name]).getTime() > new Date(vm.timeRangeAfter).getTime()) && (new Date(request[mappedFilterList[x].name]).getTime() < new Date(vm.timeRangeBefore).getTime() )){
+                                return false
+                             }
+ 
+                        }
+
+                    }
+                
+                    }else{
+                        console.log("entered else of first if")
+                    
+                    };
+                   }
+
+                   return true;
+
+               })
+
+       
+            },
+
+              loadFilterVariables(){
+                var vm = this;
+                axios.get('/getDepartmentsAndApproversWithoutGroups').then((results)=>{
+                    vm.departments = results.data.filter((result)=> result.email == null && result.name != "Requester's Own Department").map((result)=>result.name)
+                    
+                     vm.emails = results.data.filter((result)=>result.email != null).map((result)=>result.email)
+
+                }).catch((error)=>console.log(error));
+
+                axios.get('/getWorkflows').then((result)=>{
+                    vm.requestTypes = result.data.workflows.map((workflow)=>{
+                        return workflow.name
+                    })
+                }).catch((error)=>console.log(error))
+            }
+        }
+    })
+
+
+
+</script>

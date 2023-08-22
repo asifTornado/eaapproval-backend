@@ -1,0 +1,92 @@
+<div id="app" class="p-5 w-full h-screen flex-col flex justify-center items-center">
+
+
+
+<div class="w-75 h-75 mx-auto text-align-center">
+<div class="flex flex-col justify-center items-center bg-slate-500 pb-5">
+<h1 class="text-lg font-bold text-white">Current Signature</h1>
+<img class="h-52 w-52" v-bind:src="'uploads/'+signature" alt="image not available" >
+</div>
+
+<div class="mb-3">
+<input type="file" name="file" @change="uploadSignatureFile()" ref="file">
+</div>
+
+
+<div class="mb-2 flex flex-row justify-end mt-10">
+<button @click="upload" class="bg-blue-500 w-36   text-white font-bold text-md h-14 ml-3 rounded-sm mr-2">Upload</button>
+
+
+
+
+<button v-if="userType != 'Admin'" onclick="location.href='/normal'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm "> Return </button>
+<button v-else onclick="location.href='/admin'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm "> Return</button>
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+var vm = new Vue({
+    el:"#app",
+    data:{
+        signature:null,
+        file:null,
+        userType:null,
+    },
+
+    created:function(){
+        this.getSignature()
+    },
+
+
+    methods:{
+        getSignature(){
+            var vm = this;
+            axios.get("/getSignature").then((result)=>{
+                console.log("result from inside of get signature")
+                console.log(result);
+                vm.signature = result.data.signature;
+                vm.userType = result.data.userType;
+            }).catch((error)=>{
+                console.log(error.message)
+            })
+        },
+        uploadSignatureFile(){
+            
+            this.file = this.$refs.file.files[0];
+            console.log(this.file)
+        },
+
+        upload(){
+            var vm = this;
+            var data = new FormData()
+            data.append("file", this.file)
+             
+            axios.post("/uploadSignature", data, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }).then((result)=>{
+                console.log(result);
+                vm.signature = result.data.signature;
+                console.log(result.data)
+                console.log(vm.signature);
+            }).catch((error)=>{
+                console.log(error.message)
+            })
+        }
+    }
+})
+
+
+
+</script>

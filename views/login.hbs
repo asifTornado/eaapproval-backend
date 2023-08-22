@@ -1,0 +1,67 @@
+
+
+    <div class="bg-white w-full h-full items-center justify-center flex mt-20">
+
+             <div class="w-96 h-80 shadow-2xl shadow-black  hover:shadow-blue-500">
+            
+						<form method="post" action="/login"    class="bg-white shadow-md rounded px-8 pt-20 pb-8 mb-4 h-96" id="form">
+				    
+       
+
+							 
+				              
+						<div class="mb-4">
+								<label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email address</label>
+				
+								<input type="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" placeholder="Enter email" name="email">
+						</div>
+		
+
+		<div class="mb-6">
+								<label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+			
+								<input type="password" class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" placeholder="Password" name="password" >
+		</div>
+	
+							<div class="flex items-center justify-between"><button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Submit</button></div>
+
+					
+						</form>
+
+
+					</div>
+                </div>
+
+ <script>
+
+          const tour = new window.Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    classes: 'shadow-md bg-purple-dark',
+    scrollTo: true
+  }
+});
+
+
+tour.addStep({
+  id: 'steps',
+  text: 'Fill in your name and email on the designated boxed to access the app with your designated priviledges set by the admins. Note:You cannot login unless your email has been authorized by the admins or master admins',
+  attachTo: {
+    element: '#form',
+    on: 'left'
+  },
+  classes: 'example-step-extra-class',
+  buttons: [
+
+     {
+      text: 'Exit',
+      action: tour.cancel
+    }
+  ]
+});
+
+
+
+
+
+        </script>

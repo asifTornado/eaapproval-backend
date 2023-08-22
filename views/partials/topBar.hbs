@@ -1,0 +1,53 @@
+<div class="w-screen h-20 px-20 flex flex-row justify-between p-2 bg-blue-600 text-white " id="topbar" v-if="getRoute()">
+
+<div>
+   <img src="/images/logo.png" class="h-full hover:cursor-pointer hover:scale-y-125 hover:scale-x-110" alt="" srcset="" onclick="href:location='/'">
+</div>
+
+
+{{#if user}}
+<div class="flex flex-row justify-center items-center noprint border border-solid border-white px-5" id="info">
+<i class="fa-solid fa-user fa-xl mr-4"></i>
+<label class="noprint">Name:</label>
+<i class="ml-2 noprint" id="userName">{{user.name}}</i>
+
+
+<label for="" class="ml-5 noprint">Email:</label>
+<i class="ml-2 noprint">
+{{user.email}}</i>
+</div>
+{{/if}}
+
+{{#if user}}
+<div class="relative justify-center items-center  h-auto w-32 px-3 hover:cursor-pointer noprint" v-cloak  id="notifications" @mouseover ="notificationsCheck=true" @mouseleave="notificationsCheck=false" >
+   <div class="fa-solid fa-bell fa-2xl text-white absolute top-8">  </div>
+   <div class="fa-solid fa-square fa-xl text-red-500 absolute top-5 left-7 " v-if="notifications.length > 0"><span class="absolute left-2 text-white text-sm -top-2">\{{notifications.length}}</span></div>
+    <div v-show="notificationsCheck" v-cloak class="absolute top-12 right-5  w-96 h-12 " id="notificationDropDown"  >
+      <ol class=" text-xs">
+         <li class="border border-black border-solid bg-white px-2 py-1 text-black text-center relative w-full h-full" v-for="(notification, notificationCounter) in notifications" @click="getToSource($event, notification)">
+            <p v-if = "notification.event =='Request'"  > You have received a new request   </p>
+            <p v-if = "notification.event =='Rejected'"  > You request has been rejected   </p>
+            <p v-if = "notification.event =='Approved'"  > You request has been approved   </p>
+            <p v-if = "notification.event =='Defer'"  > Someone deferred a request to you   </p>
+          
+
+         </li>
+         
+      </ol>
+    </div>
+</div>
+{{/if}}
+
+<div class="flex flex-row ">
+<button class="hover:cursor-pointer noprint hover:scale-125" onclick="tour.start()"> <span class="hover:border-b-2 hover:border-b-black  ">Tour</span></button> 
+{{#if user }}   
+<button class="ml-4 hover:cursor-pointer noprint hover:scale-125" onclick="location.href='/logout'"><span class="hover:border-b-2 hover:border-b-black">Logout</span></button>
+{{/if}}
+
+
+<button v-if="getUrl()" class="ml-4 hover:cursor-pointer noprint" onclick="history.back()" v-cloak>Back</button>
+
+</div>
+
+
+</div>

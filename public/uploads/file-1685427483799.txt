@@ -1,0 +1,138 @@
+
+
+
+    <div class="h-full w-full bg-white flex flex-col items-center justify-center text-lg mt-20">
+
+       <div class="bg-white w-1/2 h-1/2 p-5 shadow-2xl shadow-dark flex flex-col items-center justify-center text-center text-lg  hover:shadow-blue-500" id="app"> <div class="hover:cursor-pointer bg-lime-500 w-full text-center pt-2 mb-2 text-lg text-white font-bold h-11" onclick="location.href='/users'" id="users">Users</div>
+    
+        <div class="hover:cursor-pointer bg-emerald-500 w-full mb-2 text-center text-lg rounded-sm text-white font-bold h-11 pt-2" onclick="location.href='/workflows'" id="workflows">Workflows</div>
+        
+        <div class="hover:cursor-pointer bg-indigo-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/departments'" id="departments">Departments</div>
+
+        <div class="hover:cursor-pointer bg-cyan-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/groups'" id="groups">Groups</div>
+    
+        <div class="hover:cursor-pointer bg-purple-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/adminRequests'" id="all_requests">All Requests</div>
+    
+        <div class="hover:cursor-pointer bg-amber-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/makeRequest'" id="make_requests" >Make Requests</div>
+        
+        <div class="hover:cursor-pointer bg-blue-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/myRequests'" id="my_requests">My Requests</div>
+    
+        <div class="hover:cursor-pointer bg-yellow-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/currentRequests'" id="current_requests">Current Requests</div>
+       
+             <div class="hover:cursor-pointer bg-rose-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/showAllFiles'" id="current_requests">All Uploaded Files</div>
+        <div class="hover:cursor-pointer bg-teal-500 w-full text-center pt-2 mb-2  text-lg rounded-sm text-white font-bold h-11" onclick="location.href='/signature'" id="signature">Signature</div>
+
+      
+
+
+
+        </div>
+
+
+
+
+        
+
+        <script>
+              const tour = new window.Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    classes: 'shadow-md bg-purple-dark',
+    scrollTo: true
+  }
+});
+
+
+tour.addStep({
+  id: 'steps',
+  text: 'If you are seeing this it means you have been granted admin priviledges by the master admin. This is your main dashboard. From here you can access all the pages required to do administrative duties.',
+  attachTo: {
+    element: '#app',
+    on: 'right-start'
+  },
+  classes: 'example-step-extra-class',
+  buttons: [
+
+     {
+      text: 'Exit',
+      action: tour.cancel
+    },
+    {
+        text: "Next",
+        action: tour.next
+    }
+  ]
+});
+
+
+tour.addStep({
+  id: 'steps',
+  text: 'This is showing the email and the name of the current logged in user. In this case it is you.',
+  attachTo: {
+    element: '#info',
+    on: 'bottom'
+  },
+  classes: 'example-step-extra-class',
+  buttons: [
+
+     {
+      text: 'Exit',
+      action: tour.cancel
+    },
+    {
+        text: "Next",
+        action: tour.next
+    }
+  ]
+});
+
+
+tour.addStep({
+  id: 'steps',
+  text: 'click this button if you want to add, edit or remove users. Users are basically other people who are not admins but can use this app.',
+  attachTo: {
+    element: '#users',
+    on: 'right'
+  },
+  classes: 'example-step-extra-class',
+  buttons: [
+
+     {
+      text: 'Exit',
+      action: tour.cancel
+    },
+    {
+        text: "Next",
+        action: tour.next
+    }
+  ]
+});
+
+
+tour.addStep({
+  id: 'steps',
+  text: 'click this button if you want to add, edit or remove workflows. Workflows are templates that other users can use to start a document approval process',
+  attachTo: {
+    element: '#workflows',
+    on: 'left'
+  },
+  classes: 'example-step-extra-class',
+  buttons: [
+
+     {
+      text: 'Exit',
+      action: tour.cancel
+    },
+    {
+        text: "Next",
+        action: tour.next
+    }
+  ]
+});
+
+
+
+
+
+        
+        </script>

@@ -1,0 +1,424 @@
+<div id="app"  class="p-10 w-full h-full">
+	
+
+<div class="w-full h-80 overflow-y-scroll  px-5 flex flex-col" v-if="addUserCheck == false & updateUserCheck == false">
+	<table  >
+	<thead class="bg-blue-500 text-white font-bold" >
+		<tr >
+			<th scope="col" class="border border-slate-300 h-14 bg-blue-500 text-center pr-16 text-sm sticky top-0">Email</th>
+			<th scope="col" class="border border-slate-300 h-14 bg-blue-500 text-center pr-16 text-sm sticky top-0">Department</th>
+			<th scope="col" class="border border-slate-300 h-14 bg-blue-500 text-center pr-16 text-sm sticky top-0">Designation</th>
+			<th scope="col" class="border border-slate-300 h-14 bg-blue-500 text-center pr-16 text-sm sticky top-0">User Type</th>
+			<th scope="col" class="border border-slate-300 h-14 bg-blue-500 text-center pr-16 text-sm sticky top-0"></th>
+		
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-for="user in status" scope="row" :key="user._id" >
+          <td   class="border-2 border-solid  text-sm text-center border-slate-300  pr-16 ">
+			 \{{user.email}}  
+		</td>
+		  <td   class="border-2 border-solid  text-sm text-center border-slate-300  pr-16 ">
+			\{{user.department}}
+
+		  </td>
+		  <td   class="border-2 border-solid  text-sm text-center border-slate-300 pr-16 ">
+		\{{user.designation}}
+
+		  </td>
+		  <td   class="border-2 border-solid  text-sm text-center border-slate-300 pr-16 ">
+			\{{user.userType}}
+
+		  </td>
+		  <td class="border-2 border-solid p-4 text-sm text-center border-slate-300  pr-16 mb-10"><button @click="$update(user)" class="h-8 rounded-md text-green-500 fa-solid fa-pen font-bold"></button>
+		  <button @click="udelete(user)"  class="h-8 ml-10 fa-solid fa-trash rounded-md text-rose-500 font-bold"></button>
+		</td>
+
+		</tr>
+	</tbody>
+</table>
+
+
+
+
+
+
+
+</div>
+
+
+{{!-- UpdateForm --}}
+ <div v-if="updateUserCheck == true" class=" flex justify-center items-center">
+	<div class="shadow-2xl hover:shadow-blue-600 w-1/2 h-1/4  flex flex-col justify-center items-center bg-white  px-10 pt-10">
+
+		<div class="flex flex-row justify-start items-start w-full mb-10"><span class="text-4xl">Update User</span></div>
+		
+				<form @submit.prevent="updateUser" class="">
+			   
+				
+		<label  class="mb-20 font-bold">Email Address</label>
+				<input v-model="updateItem.email" required class=" w-full h-11 mb-4 border border-solid border-gray-200">
+			
+			 <label class="mb-20 font-bold mt-10">Department</label> 
+			 <input list="departments" name="department" id="department" v-model="updateItem.department" type="text" class=" mb-4 h-11 w-full  border r-solid border-gray-200" >
+				<datalist id="departments">
+					
+					<option v-for="department in departments" v-if="!department.email" :value="department.name">\{{department.name}}</option>
+							 
+				</datalist>
+
+
+		<label class="mb-20 font-bold mt-10" >Groups</label>
+        <input type="text" name="groups" id="updateGroups" v-bind:value="updateItem.groups" class="mb-4 h-11 w-full  border border-solid border-gray-200" >
+		
+		  <label class="mb-20 font-bold mt-10" > User Type</label>
+				  <select name="userType" v-model="updateItem.userType" required class="mb-4 h-11 w-full  border border-solid border-gray-200" >
+					
+					<option  >Requester</option>
+					<option  >Watcher</option>
+					<option  >Approver</option>
+							 
+				  </select>
+		
+				  <br class="border border-solid border-black">
+		
+			   <button type="submit" class="w-full mt-8 h-11 bg-emerald-400 rounded-md text-2xl text-white font-bold mb-2">Update</button> 
+		
+		
+			   <button @click="uReturn" class="w-full h-11 bg-gray-300 rounded-md text-2xl text-gray-500 font-bold mb-10">Return</button>
+		
+			  </form>
+			</div>
+		
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+	{{!-- add user --}} 
+<div v-if="addUserCheck == true" class=" flex flex-col justify-center items-center" id="addDiv">
+      <div class="shadow-2xl hover:shadow-blue-600 w-1/2 h-1/3  flex flex-col justify-center items-center bg-white  px-10 pt-10">
+
+<div class="flex flex-row justify-start items-start w-full mb-10"><span class="text-4xl">Add An User</span></div>
+
+		<form @submit.prevent="addUser" class="">
+       
+		
+<label  class="mb-20 font-bold">Email Address</label>
+        <input v-model="addUserItem.email" required class=" w-full h-11 mb-4 border border-solid border-gray-200">
+    
+     <label class="mb-20 font-bold mt-10">Department</label>
+		<select name="departments" v-model="addUserItem.department" required class=" mb-4 h-11 w-full  border border-solid border-gray-200">
+            
+            <option v-for="department in departments" v-if="!department.email" :value="department.name" >\{{department.name}}</option>
+                     
+          </select>
+
+
+		<label class="mb-20 font-bold mt-10" >Groups</label>
+        <input type="text" name="groups" id="groups"  class="mb-4 h-11 w-full  border border-solid border-gray-200">
+    
+	
+
+	 
+
+  <label class="mb-20 font-bold mt-10" > User Type</label>
+		  <select name="userType" v-model="addUserItem.userType" required class="mb-4 h-11 w-full  border border-solid border-gray-200" >
+            
+			<option  >Requester</option>
+            <option  >Watcher</option>
+            <option  >Approver</option>
+                     
+          </select>
+
+		  <br class="border border-solid border-black">
+
+  
+       <button type="submit" class="w-full mt-8 h-11 bg-emerald-400 rounded-md text-2xl text-white font-bold mb-2">Add</button>
+
+
+	   <button @click="uReturn" class="w-full h-11 bg-gray-300 rounded-md text-2xl text-gray-500 font-bold mb-10">Return</button>
+
+      </form>
+	</div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+ 
+<div v-if="addUserCheck == false && updateUserCheck == false" class="mt-10 w-full text-end ">
+
+<button @click="add()" class="bg-blue-500 w-36   text-white font-bold text-md h-14 ml-3 rounded-sm ">Add User</button>
+
+<button onclick="location.href='/admin'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm  ">Home</button>
+
+
+</div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+<script >
+  var vm = new Vue({
+	el:'#app',
+	data:{
+	    update:false,
+		status:[],
+		updateItem:null,
+        addUserCheck:false,
+		updateUserCheck:false,
+		addUserItem:null,
+		addButton:false,
+		departments:null,
+		groups:null,
+		template:"{{template}}",
+		groupTags:null,
+		updateUserGroupTags:null
+	
+	},
+
+
+	watch:{
+     addUserCheck(newVal, oldVal){
+           if(newVal == true){
+		 this.$nextTick(() => {
+          this.loadGroups();
+        });
+		   }
+ 	 },
+
+	 updateUserCheck(newVal, oldVal){
+		if(newVal == true){
+			this.$nextTick(()=>{
+				this.loadUpdateGroups();
+			})
+		}
+	 }
+	},
+
+	created:function(){
+		this.loadQuote();
+		
+	
+      
+	},
+
+	updated(){
+
+		
+		
+	},
+
+    
+
+	
+	methods:{
+		loadQuote:function(){
+			
+			var vm = this;
+			axios.get("/getUsers").then(function(response){
+			    vm.status = response.data;
+				console.log(response.data)}
+				
+			).catch(function(error){
+			   console.log(error);
+			});
+
+			  axios.get("/getDepartmentsAndApprovers").then(function(response){
+			    vm.departments = response.data;
+				console.log(response.data)}
+				
+			).catch(function(error){
+			   console.log(error);
+			});
+
+
+
+			  axios.get("/getGroups").then(function(response){
+			    vm.groups = response.data;
+				console.log(response.data)}
+				
+			).catch(function(error){
+			   console.log(error);
+			});
+		},
+		udelete:function(user){ 
+			var vm = this;
+			axios.post('/deleteUser', user).then((response) => {console.log(response);
+		vm.loadQuote();
+		}, (error) => {console.log(error);});
+		},
+
+		$update:function(item){
+			this.updateUserCheck = true
+			this.updateItem = Object.assign({}, item);
+			this.addUserItem = null;
+
+		},
+		updateUser:function(){
+			var vm = this;
+			if(!this.updateItem.groups){
+			      this.$set(this.updateItem, "groups", []);
+			}
+			this.updateItem.groups = this.updateUserGroupTags.value.map(function(item){
+				return item.value
+			})
+		
+			axios.post('/updateUser', vm.updateItem ).then((response)=>{
+				console.log(response);
+				vm.loadQuote();
+				vm.updateItem = null;
+				vm.addButton = true;
+				vm.updateUserCheck = false;
+			}, (error)=>{
+				console.log(error);
+			});
+		},
+		add:function(){
+			this.addUserCheck = true;
+			this.addUserItem = Object.assign({}, {name:null, email:null, groups:[]});
+			this.addButton = false;
+			
+            
+		},
+		addUser:function(){
+			var vm = this;
+			this.addUserItem.groups = this.groupTags.value.map(function(item){
+				return item.value
+			})
+			axios.post('/insertUser', vm.addUserItem ).then((response)=>{
+				console.log(response);
+				vm.loadQuote();
+				vm.addUserItem = null;
+				vm.addButton = true;
+				vm.addUserCheck = false;
+			}, (error)=>{
+				console.log(error);
+			});
+		},
+		reset:function(){
+			this.updateItem = null,
+			this.addButton = true,
+			this.addUserItem = null
+		},
+		uReturn(){
+			this.addUserItem = null;
+			this.updateItem = null;
+			this.addUserCheck = false;
+			this.updateUserCheck = false
+		},
+
+	loadGroups(){
+    		
+	var vm = this;
+	var list = [];
+	console.log("from tagify function")
+    console.log(this.groups.length)
+
+   for(let x of this.groups){
+	list.push(x.name)
+	console.log("inside for loop");
+	console.log(x.name)
+   }
+
+	var input = document.querySelector("#groups")
+	
+	this.groupTags=  new Tagify(input, {
+		whitelist:list,
+		maxTags: 10,
+		enforceWhitelist: true,
+		dropdown: {
+		maxItems: 20,  	           // <- mixumum allowed rendered suggestions
+        classname: "tags-look", // <- custom classname for this dropdown, so it could be targeted
+        enabled: 0,             // <- show suggestions on focus
+        closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
+      }
+	})
+
+	},
+
+
+
+	loadUpdateGroups(){
+    		
+			var vm = this;
+			var list = [];
+			console.log("from tagify function")
+			console.log(this.groups.length)
+		
+		   for(let x of this.groups){
+			list.push(x.name)
+			console.log("inside for loop");
+			console.log(x.name)
+		   }
+		
+			var input = document.querySelector("#updateGroups")
+			
+			this.updateUserGroupTags=  new Tagify(input, {
+				whitelist:list,
+				maxTags: 10,
+				enforceWhitelist: true,
+				dropdown: {
+				maxItems: 20,  	           // <- mixumum allowed rendered suggestions
+				classname: "tags-look", // <- custom classname for this dropdown, so it could be targeted
+				enabled: 0,             // <- show suggestions on focus
+				closeOnSelect: false    // <- do not hide the suggestions dropdown once an item has been selected
+			  }
+			})
+		
+			},
+		
+
+
+
+	}
+  })
+
+
+
+
+
+
+  
+</script>

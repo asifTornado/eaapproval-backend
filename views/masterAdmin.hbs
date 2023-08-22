@@ -1,0 +1,205 @@
+<div id="app" class="p-10 w-full h-full">
+
+<table class="table   w-full text-sm border border-slate-500 border-solid overflow-x-scroll" id="table">
+<thead class="bg-slate-600 text-white font-bold">
+    
+        <td>
+            Name
+        </td>
+        <td>
+            Email
+        </td>
+        <td>
+            Designation
+        </td>
+        <td>
+            Department
+        </td>
+        <td>
+            Zone/Area
+        </td>
+        <td>
+            ID
+        </td>
+    
+
+</thead>
+<tbody>
+<tr v-for="(admin, adminCounter) in admins" >
+      
+        <td >
+               <input type="text"  v-model="admins[adminCounter].name" >
+        </td>
+        <td >
+               <input type="text"  v-model="admins[adminCounter].email" >
+        </td>
+        <td>
+              <input type="text"  v-model="admins[adminCounter].designation" >
+        </td>
+        <td>
+            <input type="text"  v-model="admins[adminCounter].department" >
+     </td>
+        <td>
+               <input type="text"  v-model="admins[adminCounter].zone" >
+        </td>
+        <td>
+               <input type="text" v-model="admins[adminCounter].Id" >
+        </td>
+        <td>
+              <button @click="updateAdmin(adminCounter)" class="fa-solid fa-pen text-green-500"> </button>
+        </td>
+        <td>
+              <button @click="deleteAdmin(admin)" class="fa-solid fa-trash text-red-500">  </button>
+        </td>
+</tr>
+
+</tbody>
+</table>
+
+
+
+
+<div ref="modal"  class="shadow-2xl shadow-black w-auto  h-auto left-1/2 -translate-x-56  top-1/4 -translate-y-36 bg-white hidden"  id="form">
+    <div class="flex flex-row bg-blue-600 text-white p-3">
+        <h1 class="text-2xl w-full font-bold">Add Department</h1>
+        <button @click="closeForm()" class="fa-solid fa-xmark fa-2xl text-rose-500"> </button>
+    </div> 
+<form @submit.prevent="insertAdmin" class="flex flex-col justify-between items-start w-96 p-5">
+
+    
+<label for="">Name</label>
+<input type="text"  name="name" class="w-full  border border-black border-solid h-9 mb-3">
+
+<label for="">Id</label>
+<input type="text"  name="Id" class="w-full  border border-black border-solid h-9 mb-3">
+
+<label for="">Email</label>
+<input type="text"  name="email" class="w-full  border border-black border-solid h-9 mb-3">
+
+<label for="">Designation</label>
+<input type="text"   name="designation" class="w-full  border border-black border-solid h-9 mb-3">
+
+<label for="">Department</label>
+<input type="text"   name="department" class="w-full  border border-black border-solid h-9 mb-3">
+
+<label for="">Zone</label>
+<input type="text"   name="zone" class="w-full  border border-black border-solid h-9 mb-3">
+
+<button type="submit" class="w-full bg-blue-500 h-9 text-white font-bold text-xl">Submit</button>
+</form>
+
+
+
+</div>
+
+
+
+
+<button @click="addAdmin()" class="fixed bottom-10 right-10 fa-solid fa-circle-plus fa-2xl text-blue-500 "></button>
+<button onclick="location.href='/logout'" class="btn btn-lg btn-danger">Log Out</button>
+
+
+
+</div>
+
+
+
+<script>
+
+var vm = new Vue({
+    el:'#app',
+    data:{
+        admins:null,
+        
+       
+
+    },
+    created:function(){
+        this.loadAdmins();
+    },
+    methods:{
+        loadAdmins(){
+            var vm = this;
+            axios.get("/getAdmins").then((result)=>{
+                console.log(result.data);
+                vm.admins = result.data;
+            }).catch((error)=>{
+                console.log(error.message)
+            })
+        },
+        addAdmin(){
+           var form = document.getElementById("form");
+           var table = document.getElementById("table");
+           form.classList.remove("hidden");
+           form.classList.add("fixed");
+           table.classList.add("blur")
+            
+        },
+        insertAdmin(event){
+            var vm = this;
+            var data = new FormData();
+            var elements = event.target.elements;
+            console.log("elements");
+            console.log(elements.name.value)
+            data.append("name", elements.name.value);
+            data.append("email", elements.email.value);
+            data.append("Id", elements.Id.value);
+            data.append("designation", elements.designation.value);
+            data.append("department", elements.department.value);
+            data.append("zone", elements.zone.value);
+            data.append("userType", "Admin");
+            console.log("from form data")
+            console.log(data.name)
+
+            axios.post("/insertUser", data,  {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }).then((result)=>{
+                console.log(result.data);
+                var form = document.getElementById("form");
+                var table = document.getElementById("table");
+                table.classList.remove("blur");
+                form.classList.remove("fixed");
+                form.classList.add("hidden");
+                vm.loadAdmins();
+            }).catch((error)=>{
+                console.log(error)
+            })
+        },
+        closeForm(){
+            var form = document.getElementById("form");
+            var table = document.getElementById("table");
+            table.classList.remove("blur");
+            form.classList.remove("fixed");
+            form.classList.add("hidden");
+        },
+        updateAdmin(adminCounter){
+            var vm = this;
+            var admin = this.admins[adminCounter];
+           axios.post("/updateUser", admin).then((result)=>{
+            console.log(result);
+            vm.loadAdmins()
+           }).catch((error)=>{
+            console.log(error.message)
+           })
+
+        },
+        deleteAdmin(admin){
+            var vm = this;
+           axios.post("/deleteUser", admin).then((result)=>{
+            console.log(result);
+            vm.loadAdmins()
+           }).catch((error)=>{
+            console.log(error.message)
+           })
+
+        }
+
+    }
+})
+
+
+
+
+</script>

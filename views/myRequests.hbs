@@ -1,0 +1,679 @@
+<div id="app" class="flex flex-col justify-between items-stretch w-screen h-screen px-10 ">
+
+
+
+
+<div v-if="showRequestCheck == false" class="flex flex-col">
+
+
+<div class="flex flex-row mb-10 mt-5">
+  <label for="" class="mr-2 text-sm font-semibold">Approval Status</label>
+    <select  id="requestApprovalSelector" v-model="approval_status" class="mr-3 border border-black border-solid rounded-sm text-center h-6">
+       
+     
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Pending">Pending</option>
+        <option value="All">All</option>
+     
+    </select>
+
+  
+
+    
+    
+    
+    
+        
+     <label for="requestType" class="mr-2 text-sm font-semibold">Request Type</label>
+    <select type="text" v-model='requestType' id="requestType" class="mr-10 border h-6 border-black border-solid rounded-sm text-center w-24">
+      <option value="All">All</option>
+      <option :value="requestType" v-for="(requestType, requestTypeCounter) in requestTypes" :key="requestTypeCounter"> \{{requestType}} </option>
+
+    </select>
+   
+  
+    
+  
+    <label for="id" class="mr-2 text-sm font-semibold">Id</label>
+    <input type="text" v-model='id' class="border border-black border-solid rounded-sm text-center h-6">
+
+    <div class="flex flex-row mb-10 ml-3">
+       <label for="" class="mr-3 font-semibold">Date</label>
+       <select name="" id="" v-model="timeRange" class="mr-10 border h-6 border-black border-solid rounded-sm text-center w-24">
+        <option value="All">All</option>
+          <option value="on">On</option>
+          <option value="after">After</option>
+          <option value="before">Before</option>
+          <option value="between">Between</option> 
+       </select>
+    
+       <input type="date" v-if="timeRange == 'on'" class="mr-10 border h-6 border-black border-solid rounded-sm text-center w-24" v-model="timeRangeOn"/>
+       <input type="date" v-else-if="timeRange == 'after'" class="mr-10 border h-6 border-black border-solid rounded-sm text-center w-24" v-model="timeRangeAfter"/>
+       <input type="date" v-else-if="timeRange == 'before'" class="mr-10 border h-6 border-black border-solid rounded-sm text-center w-24" v-model="timeRangeBefore"/>
+       <div type="date" v-else-if="timeRange == 'between'"  class="flex flew-row mr-10 border h-6 border-black border-solid rounded-sm text-center w-24 ">
+        <input type="date" v-model="timeRangeBefore" class="mr-4 border h-6 border-black border-solid rounded-sm text-center w-24"/>
+        <p class="font-semibold mr-4 mt-1" for="">and</p>
+        <input type="date" v-model="timeRangeAfter" class="mr-4 border h-6 border-black border-solid rounded-sm text-center w-24 "/>
+       </div>       
+    
+        <button @click="filter()" class="h-9 rounded-sm bg-amber-500 text-white font-bold px-4 absolute right-10">Filter</button>
+</div>
+  
+    </div>
+  
+ 
+    
+    
+    
+
+    
+    
+
+
+
+<div class="w-full h-80 overflow-x-scroll overflow-y-scroll "><table  v-if="showRequestCheck==false" class="w-full text-start text-sm display" > 
+   
+        <thead ><tr class="bg-blue-500 text-white font-bold"><th class="border border-slate-300 border-solid text-center pr-16 text-sm h-14 bg-blue-500 sticky top-0 text-white">Request Type</th> 
+        <th class="border border-slate-300 border-solid  text-center pr-16 text-sm h-14 bg-blue-500 sticky top-0 text-white">Request Date</th> 
+        <th class="border border-slate-300 border-solid  text-center pr-16 text-sm h-14 bg-blue-500 sticky top-0 text-white">Number of Approvers</th> 
+        <th class="border border-slate-300 border-solid  text-center pr-16 text-sm h-14 bg-blue-500 sticky top-0 text-white">Current Approver</th> 
+        <th class="border border-slate-300 border-solid  text-center pr-16 text-sm h-14 bg-blue-500 sticky top-0 text-white">Approvers Left</th> 
+        <th class="border border-slate-300 border-solid  text-center pr-16 text-sm h-14 bg-blue-500 sticky top-0 text-white">Approval Status</th>
+        </tr></thead>
+  
+        
+
+     <tbody>  <tr v-for="(request, requestCounter) in myFilteredRequests" style="cursor:pointer" @click="showRequest(request)"  :key="requestCounter" class="hover:cursor-pointer hover:bg-blue-200">
+         <td class="border border-solid border-slate-300 text-sm text-center h-14 pr-16">\{{request.time}}</td>
+         <td class="border border-solid border-slate-300 text-sm text-center h-14 pr-16">\{{request.requestType}}</td> 
+         <td class="border border-solid border-slate-300 text-sm text-center h-14 pr-16">\{{request.number_of_approvers}}</td> 
+         <td class="border border-solid border-slate-300 text-sm text-center h-14 pr-16">
+          <template v-if="request.current_approver != null">\{{request.current_approver.name}}</template></td> 
+          <td class="border border-solid border-slate-300 text-sm text-center h-14 pr-16">\{{request.approvers_left}}</td> 
+          <td class="border border-solid border-slate-300 text-sm text-center h-14 pr-16">\{{request.approval_status}}</td>
+        
+       </tr></tbody>
+  </table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+<div v-if="showRequestCheck==true && showRequestItem.approval_status != 'Rejected'" class="w-full  flex flex-col items-stretch">
+<h1 class="text-2xl text-black font-semibold  text-center">\{{showRequestItem.requestType}}</h1>
+<table class="mb-5">
+ <tr class="border border-slate-300 border-solid bg-blue-500 text-white font-bold"><td colspan="2" >Basic</td> </tr>
+<tr ><th  class="border border-slate-300 border-solid text-sm text-center  h-14 pr-16">Request Type</th><td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{showRequestItem.requestType}}</td></tr>
+<tr ><th class="border border-slate-300 border-solid text-sm text-center  h-14 pr-16">Requester's Name</th><td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{showRequestItem.name}}</td></tr>
+<tr ><th class="border border-slate-300 border-solid text-sm text-center  h-14 pr-16">Requester's Designation</th><td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{showRequestItem.designation}}</td></tr>
+<tr ><th class="border border-slate-300 border-solid text-sm text-center  h-14 pr-16">Requester's Department</th><td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{showRequestItem.department}}</td></tr>
+
+
+</table>
+
+
+<h1  class="border border-slate-300 border-solid bg-blue-500 text-white font-bold mt-10" v-if="showRequestItem.infos.length > 0">Information</h1>
+<table class="highlight mb-5 " id="show infos" v-if="showRequestItem.infos">
+ 
+   <tr v-for="info in showRequestItem.infos"  >
+    
+  <template v-if="info.dataType != 'list' && info.dataType != 'file'">
+    <th  class="border border-slate-300 border-solid text-start p-5"> \{{info.name}}</th><td class="border border-slate-300 border-solid text-start pl-20"> \{{info.input}}</td>
+  </template>
+   <template v-else-if="info.dataType == 'file'">
+          <th class="border border-slate-300 border-solid text-start p-5"> \{{info.name}} </th>
+          <td class="border border-slate-300 border-solid text-start pl-20">
+                   
+                <div v-for="(file, inputCounter) in info.input" class="flex flex-row justify-between mb-1 p-1">
+                     <a target="_blank" :href="'/uploads/'+file.fileName">\{{file.originalName}}</a>
+                     <a target="_blank" :href="'/pdf/'+file.fileName" v-if="getFileType(file.fileName) == 'pdf'" class="p-1 ml-2 text-xs bg-green-500 text-white border border-black border-solid">Edit PDF </a>
+                     <a target="_blank" :href="'/image/'+file.fileName" v-else-if="getFileType(file.fileName) == 'image'" class="p-1 ml-2 text-xs bg-green-500 text-white border border-black border-solid">Edit Image </a>
+                </div>   
+          </td>
+      </template>
+  <td v-else colspan="2" class="border border-slate-300 border-solid text-start p-5">
+         <label for="" class="text-md font-bold">\{{info.name}}</label>
+ 
+     <table class="table-fixed w-full">
+      <thead>
+        
+      <th v-for="answer in info.answerList" class="border border-slate-300 border-solid text-start p-5">
+         \{{answer.label}}
+      </th>
+      </thead>
+      <tbody>
+         <tr v-for="response in info.responses">
+           <td v-for="(value, key) in response" class="border border-slate-300 border-solid text-start p-5" >
+            \{{value}}
+           </td>
+         </tr>
+
+      </tbody>
+    
+     </table>
+  
+
+  </td>
+    
+  </tr>
+</table>
+
+
+<h1 class="border border-slate-300 border-solid bg-blue-500 text-white font-bold mt-10"  v-if="showRequestItem.extraInfos.length > 0">Extra Information</h1>
+<table class="highlight mb-5" id="show extra infos" v-if="showRequestItem.extraInfos">
+
+  <tr v-for="info in showRequestItem.extraInfos" ><th  class="border-b text-sm text-center border-b-slate-100 h-14 pr-16"> \{{info.name}}</th><td class="border-b text-sm text-center border-b-slate-100 h-14 pr-16"> \{{info.input}}</td></tr>
+</table>
+
+
+<h1  class="border border-slate-300 border-solid bg-blue-500 text-white font-bold mt-10"  v-if="showRequestItem.approvals.length != 0">Approvers</h1>
+  <table v-if="showRequestItem.approvals.length > 0" class="table-auto">
+    <thead >
+        <tr >
+          
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Name</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Email</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Id</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Designation</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Status</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Comment</th>
+              <th class="border text-sm text-center border-slate-300 border-solid  h-14 pr-16">Relevant Files</th>
+        </tr>
+        
+    </thead>
+    <tbody>
+        <tr v-for="(approver, counter) in showRequestItem.approvals" >
+     
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.name}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.email}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.id}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.designation}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.status}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.comment}}</td>
+             <td class="border border-solid border-slate-300"><div  v-for="(file, fileCounter) in approver.fileNames" v-if="approver.fileNames.length > 0" ><a v-bind:href="'uploads/'+file.fileName"  target="_blank" @click.prevent="showFile">\{{file.originalName}}</a> <a :href="'pdf/'+file.fileName"  target="_blank" rel="noopener noreferrer" class="h-auto px-2 bg-green-400  border border-slate-300 border-solid mr-3 text-xs text-white noprint" v-if="getFileType(file) == 'pdf'">Edit Pdf</a><a v-bind:href="'image/'+file.fileName" target="_blank" rel="noopener noreferrer" class="h-auto px-2 bg-green-400  border border-black border-solid mr-3 text-xs text-white noprint" v-else-if="getFileType(file) == 'image'">Edit Image</a> </div></td>
+        </tr>
+    </tbody>
+  </table>
+
+
+<h1  class="border border-slate-300 border-solid bg-blue-500 text-white font-bold mt-10"  v-if="showRequestItem.approvals.length > 0">Signatures</h1>
+
+
+
+   <div class="flex flex-row">
+       <template v-for="(approver, approverCounter) in showRequestItem.approvals" v-if="showRequestItem.approvals.length > 0">
+               
+               <div  class="mr-3 inline-block justify-center items-center h-auto w-auto p-0 m-0">
+            
+                  <img v-bind:src="'uploads/'+approver.signature" alt="No Uploaded Signature" class="w-32 h-28 mt-3"> 
+                           
+                    <figcaption class="flex flex-col justify-center items-center"> \{{approver.name}}</figcaption>  
+              
+               
+               
+               </div>
+
+
+               <!-- <figure>
+                <img src="pic_trulli.jpg" alt="Trulli" style="width:100%">
+                <figcaption>Fig.1 - Trulli, Puglia, Italy.</figcaption>
+              </figure> -->
+            
+       
+       
+           </template>
+           
+   </div>
+<div class="mt-3 flex flex-row items-end justify-end w-ful mb-10">
+
+<button @click="rReturn" v-if="showRequestCheck==true" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm ml-96 mb-10 noprint" >Return </button>
+</div>
+{{>discussions this}}
+</div>
+
+{{!-- start of rejected section  --}}
+
+
+<div v-if="showRequestCheck==true && showRequestItem.approval_status == 'Rejected'" class="w-full text-sm flex flex-col items-stretch">
+<h1 class="text-2xl text-black font-bold text-center">\{{showRequestItem.requestType}}</h1>
+<table >
+
+<tr ><th  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Request Type</th><td class="border border-solid text-sm text-center border-slate-300">\{{showRequestItem.requestType}}</td></tr>
+<tr ><th  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Requester's Name</th><td class="border border-solid text-sm text-center border-slate-300">\{{showRequestItem.name}}</td></tr>
+<tr ><th  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Requester's Designation</th><td class="border border-solid text-sm text-center border-slate-300">\{{showRequestItem.designation}}</td></tr>
+<tr ><th  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Requester's Department</th><td class="border border-solid text-sm text-center border-slate-300">\{{showRequestItem.department}}</td></tr>
+
+
+</table>
+
+
+
+<h1 class="mt-4 text-white font-bold bg-blue-500" v-if="showRequestItem.infos.length > 0">Information</h1>
+
+<table  id="show infos" v-if="showRequestItem.infos.length > 0">
+
+   <tr v-for="(info, infoCounter) in showRequestItem.infos">
+    
+  <template v-if="info.dataType != 'list' && info.dataType != 'file'">
+    <th  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16"> \{{info.name}}</th><td  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">  <input :type="info.dataType" v-model="showRequestItem.infos[infoCounter].input"></td>
+  </template>
+   <template v-else-if="info.dataType == 'file'">
+          <th class="border border-slate-300 border-solid text-start p-5"> \{{info.name}} </th>
+          <td class="border border-slate-300 border-solid text-start pl-20">
+                    <div v-for="(file, inputCounter) in info.input" class="flex flex-row justify-between mb-1 p-1">
+                     <a target="_blank" :href="'/uploads/'+file.fileName">\{{file.originalName}}</a>
+                     <a target="_blank" :href="'/pdf/'+file.fileName" v-if="getFileType(file.fileName) == 'pdf'" class="p-1 ml-2 text-xs bg-green-500 text-white border border-black border-solid">Edit PDF </a>
+                     <a target="_blank" :href="'/image/'+file.fileName" v-else-if="getFileType(file.fileName) == 'image'" class="p-1 ml-2 text-xs bg-green-500 text-white border border-black border-solid">Edit Image </a>
+                </div>   
+          </td>
+      </template>
+  <td v-else colspan="2"  class="border-b text-sm text-center border-b-slate-100 h-14 pr-16">
+    <label >\{{info.name}}</label>
+ 
+     <table>
+      <thead>
+      <th v-for="answer in info.answerList"  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">
+         \{{answer.label}}
+      </th>
+      </thead>
+      <tbody>
+         <tr v-for="(response, responseCounter) in info.responses" >
+           <td v-for="(value, key) in response"  class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">
+            <input type="text" v-model="showRequestItem.infos[infoCounter].responses[responseCounter][key]">
+           </td>
+         </tr>
+
+      </tbody>
+    
+     </table>
+  
+
+  </td>
+    
+  </tr>
+</table>
+
+
+
+<h1 class="text-2xl text-white bg-blue-500 font-bold mt-5" v-if="showRequestItem.extraInfos.length > 0">Extra Information</h1>
+<table  id="show extra infos" v-if="showRequestItem.extraInfos">
+
+  <tr v-for="(extraInfo, extraInfoCounter) in showRequestItem.extraInfos" ><th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16"> \{{extraInfo.label}}</th><td class="border-b text-sm text-center border-b-slate-100 h-14 pr-16"><input :type="extraInfo.type" v-model="showRequestItem.extraInfos[extraInfoCounter].input"> </td></tr>
+</table>
+
+
+
+<h1 class="text-white bg-blue-500 font-bold mt-5" v-if="showRequestItem.approvals.length > 0">Approvals</h1>
+  <table v-if="showRequestItem.approvals.length > 0" >
+    <thead>
+        <tr >
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Name</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Email</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Id</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Approver Designation</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Status</th>
+            <th class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">Comment</th>
+        </tr>
+        
+    </thead>
+    <tbody>
+        <tr v-for="(approver, counter) in showRequestItem.approvals" >
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.name}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.name}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.email}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.id}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.designation}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.status}}</td>
+            <td class="border border-solid text-sm text-center border-slate-300 h-14 pr-16">\{{approver.comment}}</td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+
+  
+        
+<h1 class="mt-5 text-white font-bold bg-blue-500" v-if="showRequestItem.approvals.length > 0">Signature</h1>
+ <div class="flex flex-row mt-5">
+       <template v-for="(approver, approverCounter) in showRequestItem.approvals"  v-if="showRequestItem.approvals.length > 0">
+               
+        <div  class="mr-3 inline-block justify-center items-center h-auto w-auto p-0 m-0">
+            
+          <img v-bind:src="'uploads/'+approver.signature" alt="No Uploaded Signature" class="w-32 h-28 mt-3"> 
+                   
+            <figcaption class="flex flex-col justify-center items-center"> \{{approver.name}}</figcaption>  
+      
+       
+       
+       </div>
+            
+       
+       
+           </template>
+           
+   </div>
+     
+
+
+  
+<div class="mt-5 relative mb-52">
+
+<button @click="makeRequestAgain()"  class="bg-emerald-500 h-9 w-auto px-3 rounded-sm text-white font-bold text-lg absolute left-5 noprint"> Make Request Again </button>
+<button @click="() => showRequestCheck = false" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm ml-96 mb-10 noprint absolute right-5"> Back </button>
+</div>
+
+
+
+
+
+
+
+
+{{>discussions this}}
+
+</div>
+
+
+
+
+
+{{!-- end app  --}}
+
+
+
+
+
+
+
+<div  v-if="showRequestCheck == false" class="w-full h-full text-end">
+  <button  v-if="userType != 'Admin'" onclick="location.href='/normal'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm mr-10 mt-5" > Home</button>
+  <button v-else onclick="location.href='/admin'"class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm mr-10 mt-5"> Home</button>
+  </div>
+
+</div>
+
+
+<script>
+var vm = new Vue({
+    el:"#app",
+    mixins:[messageMixin],
+    data:{
+        myRequests:null,
+        myFilteredRequests:null,
+        showRequestCheck:false,
+        showRequestItem:null,
+        requestTypeSelector:"",
+        userType:"",
+        id:"All",
+        email:null,
+        designation:null,
+        department:"All",
+        requestType:"All",
+        approval_status:"All",
+        showRequestCheck:false,
+        urlId:'{{#if id}}{{id}}{{/if}}',
+        files:[],
+        requestTypes:[],
+        timeRange:null,
+        timeRangeBefore:null,
+        timeRangeAfter:null,
+        timeRangeOn:null
+    },
+      
+    
+ 
+    created:function(){
+        this.loadMyRequests();
+        this.loadFilterVariables();
+      
+    },
+    methods:{
+        loadMyRequests(){
+            var vm = this;
+			axios.get("/getMyRequests").then(function(response){
+			    vm.myRequests = response.data.myRequests;
+          vm.myFilteredRequests = response.data.myRequests;
+          vm.userType = response.data.userType;
+				console.log(response.data);
+            
+            if(vm.urlId){
+                  vm.loadUrlItem(); 
+               }
+        }
+
+
+        
+				
+			).catch(function(error){
+			   console.log(error);
+			});
+        },
+        loadWorkFlows(){
+
+        },
+        showRequest(request){
+            this.showRequestCheck = true;
+            this.showRequestItem = request;
+            this.messages = this.showRequestItem.messages || [];
+           
+        },
+        rReturn(){
+            this.showRequestCheck = false;
+            this.showRequestItem = null;
+        },
+        showFile(event){
+          
+             window.open(event.target.href, '_blank', 'height=600,width=800,resizable=yes,scrollbars=yes');
+        },
+
+        reUpload(event, counter){
+          console.log(event.target.files[0])
+          console.log(counter)
+          if(this.showRequestItem.infos[counter].input.newOriginalName){ 
+            console.log("from if")    
+                this.showRequestItem.infos[counter].input.newOriginalName = event.target.files[0].name;
+                this.files.push(event.target.files[0])
+          }else{
+            console.log("from else")
+            this.$set(this.showRequestItem.infos[counter].input, "newOriginalName", event.target.files[0].name);
+             this.files.push(event.target.files[0])
+          }
+        
+      
+
+    },
+    makeRequestAgain(){
+      var vm = this;
+      var data = new FormData();
+      for(let x of this.files){
+           data.append("file", x)
+      }
+     
+      data.append("item", JSON.stringify(this.showRequestItem));
+      console.log("showRequestItem before being sent")
+      console.log(this.showRequestItem)
+
+      axios.post("/makeRequestAgain", data, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }).then((result)=>{
+              console.log(result);
+              vm.loadMyRequests();
+              vm.showRequestCheck = false;
+              vm.showRequestItem = null
+            }).catch((error)=>{
+              console.log(error)
+            })
+    },
+
+         getFileType(fileName){
+              if(fileName){
+              var lastThree = fileName.slice(-3);
+              var lastFour = fileName.slice(-4);
+                   if(lastThree == "pdf"){
+                    return "pdf"
+                   }else if(lastThree == "png" || lastFour == "jpeg" || lastThree == "jpg" || lastThree == "JPG"){
+                    return "image"                    
+                   }
+
+              }else{
+                return false
+              }
+              
+             
+            },
+
+
+            filter(){
+
+                var vm = this;
+
+                var filterList = [ {name:"id", value:this.id}, {name:"approval_status", value:this.approval_status}, {name:"requestType", value:this.requestType}, {name:"time", value:this.timeRange}];
+
+
+            
+
+
+
+
+
+               console.log("filter request")
+                console.log(filterList);
+                var mappedFilterList = filterList.map((data)=>{
+                    if(data.value != "All"){
+                        return data
+                    }else{
+                        return null
+                    }
+                });
+
+                console.log("mappedFilterList")
+                console.log(mappedFilterList)
+               
+
+               this.myFilteredRequests = this.myRequests.filter(function(request){
+                    console.log("entered main filter")
+                   for(let x=0; x < mappedFilterList.length; x++){
+                         console.log("value of mapped filter list")
+                         console.log(mappedFilterList[x])
+                         console.log(x)
+                         console.log("entered first loop")
+                 if(mappedFilterList[x] != null){
+                       console.log("entered first if")
+                    if(mappedFilterList[x].name != 'time'){
+                        console.log("entered first mappedfilterList")
+                        if((request[mappedFilterList[x].name] != mappedFilterList[x].value) ){
+                        return false
+                    }
+
+                    }else{
+                        console.log("entered second mappedfilterList")
+                        if(mappedFilterList[x].value == 'on'){
+                               console.log("entered on")
+                             request_Time = request[mappedFilterList[x].name]
+                             filter_Time = new Date(vm.timeRangeOn).toDateString()
+                             
+                             if(request_Time != filter_Time){
+                                console.log("request time")
+                                console.log(request_Time)
+                                console.log("filtered time")
+                                console.log(filter_Time)
+                                return false
+                             }
+
+                        }else if(mappedFilterList[x].value == "after"){
+                                   
+                            if( new Date(request[mappedFilterList[x].name]).getTime() < new Date(vm.timeRangeAfter).getTime()){
+                                return false
+                             }
+
+                        }else if(mappedFilterList[x].value == "before"){
+
+                            if( new Date(request[mappedFilterList[x].name]).getTime() > new Date(vm.timeRangeBefore).getTime()){
+                                return false
+                             }
+
+                        }else if(mappedFilterList[x].value == "between"){
+                            if( (new Date(request[mappedFilterList[x].name]).getTime() > new Date(vm.timeRangeAfter).getTime()) && (new Date(request[mappedFilterList[x].name]).getTime() < new Date(vm.timeRangeBefore).getTime() )){
+                                return false
+                             }
+ 
+                        }
+
+                    }
+                
+                    }else{
+                        console.log("entered else of first if")
+                    
+                    };
+                   }
+
+                   return true;
+
+               })
+
+       
+            },
+              loadUrlItem(){
+                 var vm = this;
+                 console.log(vm.urlId)
+                
+                var filter = this.myRequests.filter(function(request){
+                  return request._id == vm.urlId
+                })
+
+                vm.showRequestItem = filter[0]
+
+                  vm.showRequestCheck = true;
+                 },
+
+                
+            loadFilterVariables(){
+                var vm = this;
+  
+
+                axios.get('/getWorkflows').then((result)=>{
+                    vm.requestTypes = result.data.workflows.map((workflow)=>{
+                        return workflow.name
+                    })
+                }).catch((error)=>console.log(error))
+            }
+}
+})
+
+
+  document.addEventListener('DOMContentLoaded', function(){
+       vm.loadUrlItem();
+  })
+
+
+
+
+</script>
+
+
+<script>
+
+
+</script>

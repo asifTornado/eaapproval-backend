@@ -1,0 +1,331 @@
+<div class="body h-full w-full" >
+    
+        
+        
+        <div class="fixed top-2 right-10 bg-blue-500 text-white p-5 w-auto h-auto   z-40 mb-20">
+          <button class="mr-5" id="prev-page" >
+            <i class="fas fa-arrow-circle-left fa-xl"></i> Prev Page
+          </button>
+          <button class="mr-5" id="next-page" >
+            Next Page <i class="fas fa-arrow-circle-right fa-xl"></i>
+          </button>
+          <span class="page-info">
+            Page <span id="page-num"></span> of <span id="page-count"></span>
+          </span>
+        </div>
+    
+ 
+      <div class="wrapper">
+          <canvas id="pdf-render" style="margin-left: 100px;"></canvas>
+      </div>
+   
+      
+    
+    <div class="fixed bottom-2 right-10 bg-gray-500  text-white w-auto h-auto p-5">
+        <input type="file" name="" id="file">
+        <button onclick="updatePDF()" class="bg-emerald-500 rounded-sm text-white font-bold w-auto p-5 h-auto" >Update PDF</button>
+    </div>
+        <h1 id="name" style="visibility:hidden">{{name}}</h1>
+    
+       
+</div>
+
+
+
+
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+
+
+    <script>
+      
+     
+      // start of image moving
+
+
+
+      // end of image moving
+ 
+  var nameElem = document.getElementById("name")
+ var name = nameElem.innerHTML;
+ console.log(name);
+
+
+  const url = "/uploads/"+name;
+  console.log(url) 
+
+  
+  const fileInput = document.getElementById("file");
+  
+  
+  var imageWidth = 200;
+  var imageHeight = 100;
+  
+  var posX = 100;
+  var posY = 0;
+  var img = null;
+  
+  
+  let pdfDoc = null,
+    pageNum = 1,
+    pageIsRendering = false,
+    pageNumIsPending = null;
+  
+  const scale = 2,
+    canvas = document.querySelector('#pdf-render'),
+    ctx = canvas.getContext('2d');
+
+    
+
+
+
+  
+  // Render the page
+  const renderPage = num => {
+    pageIsRendering = true;
+  
+    // Get page
+    pdfDoc.getPage(num).then(page => {
+      // Set scale
+      const viewport = page.getViewport({scale});
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+    
+  
+      const renderCtx = {
+        canvasContext: ctx,
+        viewport
+      };
+  
+      page.render(renderCtx).promise.then(() => {
+        pageIsRendering = false;
+        ctx.drawImage(img, posX - (imageWidth / 2), posY - (imageHeight / 2), imageWidth, imageHeight)
+        
+        if (pageNumIsPending !== null) {
+          renderPage(pageNumIsPending);
+          pageNumIsPending = null;
+        }
+      });
+  
+      // Output current page
+      document.querySelector('#page-num').textContent = num;
+    });
+  };
+  
+  // Check for pages rendering
+  const queueRenderPage = num => {
+    if (pageIsRendering) {
+      pageNumIsPending = num;
+    } else {
+      renderPage(num);
+    }
+  };
+  
+  // Show Prev Page
+  const showPrevPage = () => {
+    if (pageNum <= 1) {
+      return;
+    }
+    pageNum--;
+    queueRenderPage(pageNum);
+  };
+  
+  // Show Next Page
+  const showNextPage = () => {
+    if (pageNum >= pdfDoc.numPages) {
+      return;
+    }
+    pageNum++;
+    queueRenderPage(pageNum);
+  };
+  
+  // Get Document
+   function loadpage(pageNumber){
+  pdfjsLib
+    .getDocument(url)
+    .promise.then(pdfDoc_ => {
+      pdfDoc = pdfDoc_;
+  
+      document.querySelector('#page-count').textContent = pdfDoc.numPages;
+  
+      renderPage(pageNumber);
+    })
+    .catch(err => {
+      // Display error
+      const div = document.createElement('div');
+      div.className = 'error';
+      div.appendChild(document.createTextNode(err.message));
+      document.querySelector('body').insertBefore(div, canvas);
+      // Remove top bar
+      document.querySelector('.top-bar').style.display = 'none';
+    });
+
+  };
+
+  loadpage(pageNum);
+  
+  // Button Events
+  document.querySelector('#prev-page').addEventListener('click', showPrevPage);
+  document.querySelector('#next-page').addEventListener('click', showNextPage);
+  
+  
+  
+  
+  
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+  
+    // Create an image element
+    img = new Image(file);
+  
+    // Load image file into the image element
+    img.onload = () => {
+      // Clear canvas
+      
+  
+      // Scale image to fit desired dimensions while maintaining aspect ratio
+  
+      
+  
+     
+  
+  
+        // ctx.drawImage(img, posX, posY, imageWidth, imageHeight);
+  
+      
+  
+  
+  
+  
+  
+      
+      
+  
+      // canvas.toBlob((blob) => {
+      //   const url = URL.createObjectURL(blob);
+      //   const link = document.createElement('a');
+      //   link.href = url;
+      //   link.download = 'image.png';
+      //   link.click();
+      // });
+    };
+  
+    // Read uploaded file as data URL
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  
+  
+  
+  
+  
+  
+  canvas.onmousedown = async (e) =>{
+  
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    posX = mouseX;
+    posY = mouseY;
+    renderPage(pageNum)
+    
+  
+    
+   
+  //   // if((mouseX >= posX) && (mouseX <= (posX + imageWidth)) && (mouseY >= posY) && (mouseY <= (posY + imageHeight))){
+  //   //   console.log("clicked the image");
+  //   //   draggable = true;
+  //   // }
+  
+    // Use mouseX and mouseY as needed
+    console.log('Mouse X:', mouseX);
+    console.log('Mouse Y:', mouseY);
+  
+  }
+  
+  
+  
+  // canvas.onmousemove = (e) =>{
+  //   const rect = canvas.getBoundingClientRect();
+  //   const mouseX = e.clientX - rect.left;
+  //   const mouseY = e.clientY - rect.top;
+    
+  //   // Use mouseX and mouseY as needed
+  //   console.log('Mouse X:', mouseX);
+  //   console.log('Mouse Y:', mouseY);
+  
+    
+  //   if(draggable){
+  //     prevX = posX;
+  //     prevY = posY
+  //     posX = mouseX;
+  //     posY = mouseY;
+  
+  //     renderPage(pageNum)
+  
+  //     // queueRenderPage(pageNum);
+     
+  //   }
+  // }
+  
+ 
+  
+  
+  function updatePDF(){
+
+         notie.alert({
+  type: "info", // optional, default = 4, enum: [1, 2, 3, 4, 5, 'success', 'warning', 'error', 'info', 'neutral']
+  text: "Updating PDF........",
+  stay: false, // optional, default = false
+  time: 1, // optional, default = 3, minimum = 1,
+  position: "bottom"
+})
+  var nt = notie;
+    var loadpagefrominside = this.loadpage;
+    var renderPageFromInside = this.renderPage
+  
+    var image = canvas.toDataURL('image/jpeg', 1.0);
+    
+    var data = new FormData()
+    
+    data.append("file", image);
+    data.append("number", JSON.stringify(pageNum));
+    data.append("filename", name);
+    console.log(pageNum)
+    
+    axios.post("/pdf", data,  {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then((result)=>{
+      console.log(result);
+      var pageNumber = parseInt(result.data.pageNumber)
+      loadpagefrominside(pageNumber);
+      
+     
+    }).catch((error)=>{
+      console.log(error)
+       
+    
+       
+    })
+    
+    
+    
+    }
+  
+  
+
+   
+
+  
+
+
+
+
+    </script>
+
+

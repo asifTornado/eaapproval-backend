@@ -1,0 +1,73 @@
+<div id="app" class="pl-10 pt-20">
+
+<div v-for="file in files" class="w-52 h-auto mb-32 mr-10 inline-block border border-black p-3">
+   <a :href="'/uploads/'+file.fileName" target="_blank">
+
+      <div class="text-end flex flex-col justify-center items-center"><img :src="getFileType(file.originalName)" alt="" srcset="" height="80px" width="80px"></div>
+      <div class="text-xs mt-2 flex flex-col justify-center items-center">\{{file.originalName}}</div>
+
+
+    </a>
+</div>
+
+
+</div>
+
+
+
+<script>
+    var vm = new Vue({
+        el:"#app",
+        data:{
+            files:[]
+        },
+
+        created:function(){
+            this.loadFiles()
+        },
+
+        methods:{
+            loadFiles(){
+
+                var vm = this;
+                axios.get("/getAllFiles").then((result)=>{vm.files = result.data}).catch((error)=> {console.log(error)})
+            },
+
+            getFileType(originalName){
+                   var ext = originalName.slice(-3)
+        if(ext == "pdf"){
+            return '/images/pdf.png'
+        }else if(ext == "jpg" || ext == "peg"){
+            return '/images/jpg.png'
+        }else if(ext == "doc" || ext == "docx" || ext == "odt"){
+            return '/images/doc.png'
+        }else if(ext == "xlsx"){
+            return '/images/xlsx.png'
+        }else if(ext == "txt"){
+            return '/images/txt.png'
+        }else{
+            return '/images/folder.png'
+        }
+            }
+        }
+    })
+
+
+    Vue.filter('getFileType', function(originalName) {
+     
+        var ext = originalName.slice(-3)
+        if(ext == "pdf"){
+            return '/images/pdf.png'
+        }else if(ext == "jpg" || ext == "peg"){
+            return '/images/jpg.png'
+        }else if(ext == "doc" || ext == "docx" || ext == "odt"){
+            return '/images/doc.png'
+        }else if(ext == "xlsx"){
+            return '/images/xlsx.png'
+        }else if(ext == "txt"){
+            return '/images/txt.png'
+        }else{
+            return '/images/folder.png'
+        }
+});
+</script>

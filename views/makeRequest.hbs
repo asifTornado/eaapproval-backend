@@ -1,0 +1,519 @@
+
+
+<div id="app" class="w-full h-full flex flex-col justify-center items-center p-5">
+
+ 
+  <h1 class="font-weight-bold">Please Make A Request</h1>
+
+<div class="flex flex-row w-full justify-center items-center mb-2">
+    
+    <label class="text-lg font-bold text-black mr-5" >Request Type</label>
+    <select name="requestType" v-model="requestType" required  @change="onChange($event)" id="requestType" class="w-1/3 h-9 text-lg font-bold text-black border border-solid border-black">
+                
+                <option v-for="workflow in workflows" > \{{workflow.name}} </option>
+                <option>custom</option>
+                         <label for="requestType">Request Type</label>
+    </select>
+</div>
+
+
+
+
+
+
+
+<div class="border p-3 w-full mb-4 " v-if="infos.length > 0">
+  <h1 class="mb-3 text-xl">Information</h1>
+    <div v-for="(info, counter) in infos" class="border p-3">
+
+
+    <div class="w-full h-auto bg-gray-100 pb-6 flex-col flex items-start justify-center pt-6 pl-6">
+      <label v-bind:for="counter + 1" class="mb-6">\{{infos[counter].name}}</label>
+    <input v-if="infos[counter].dataType != 'selection' && infos[counter].dataType != 'list' && infos[counter].dataType != 'file'" v-bind:id="counter + 1" v-model="infos[counter].input" v-bind:type="infos[counter].dataType" class="appearance-none hover:outline-none w-1/2 bg-transparent border-b-solid border-b-black border-b" required>
+    <select v-else-if="infos[counter].dataType == 'selection'" v-model="infos[counter].input" class="form-control" required>
+      <option v-for="option in infos[counter].options">\{{option}}</option>
+    </select>
+    <div v-else-if="infos[counter].dataType == 'file'">
+  
+    <input type="file" @change="setFile($event, counter)" multiple>
+
+    </div>
+    
+    
+    
+    
+    
+    <div v-else-if="infos[counter].dataType == 'list'" class="px-5  w-full flex flex-col" >
+                
+    
+    
+    
+   <div class="px-5 overflow-x-scroll w-full ">
+        <table class=" w-full ">
+             <thead>
+               
+           <th v-for="(answer, answerCounter) in infos[counter].answerList" class="border border-solid border-black w-11 ">
+           
+           
+           <label for="" >\{{answer.label}}</label>
+           
+           
+           
+           
+           
+           </th>
+       
+          
+           
+           </thead>
+           <tbody>
+           
+           <tr v-for="(response, responseCounter) in infos[counter].responses" class="p-3 border">
+           
+           <td v-for="(value, key) in response" class="border border-solid border-black w-11"  >
+           <input type="text" v-model="infos[counter].responses[responseCounter][key]" required class=" hover:outline-none bg-transparent w-full text-center ">
+           
+           </td>
+       
+         
+                 
+         
+          
+           </tr>
+           </tbody>
+           </table>
+   </div>
+
+
+<div class="flex flex-row items-end justify-end mt-10 mb-5">
+    
+      <button @click="addResponses(counter)" class=" btn btn-sm fa-solid fa-circle-plus fa-2xl mr-2"></button>
+     <button @click="removeResponses(counter)" class=" btn btn-sm fa-solid fa-circle-minus fa-2xl"> </button>
+</div>
+
+
+    </div>
+
+
+
+    </div>
+    
+   
+    
+    
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<div class="border p-3 w-full">
+      <h1 class="mb-3 text-xl">Extra Information</h1>
+    <div v-for="(info, counter) in extraInfos" class="mb-5 border border-black">
+
+   <div class="w-full h-20 bg-gray-100 pb-6 flex items-center justify-center pt-6 px-3 "> 
+    <label v-bind:for="counter + 1" class="mr-3">EI \{{counter + 1}}</label>
+
+    <input v-bind:id="counter + 1" v-model="extraInfos[counter].name" class="text-center w-1/4 h-10 border-solid border-black border rounded-sm" placeholder="Information Title" >
+
+
+       <select name="dataType" v-model="extraInfos[counter].dataType" id="dataType"  class="text-center h-10 w-1/4 border-solid border-black border">
+                <option value="" selected disabled>Data Type</option>
+                <option> text </option>
+                <option> number </option>
+        
+                <option> date </option>
+                <option> time </option>
+               
+                         
+    </select>
+  
+    <input v-bind:id="counter + 1" v-model="extraInfos[counter].input" v-bind:type="extraInfos[counter].dataType" class="text-center w-1/4 h-10 border-solid border-black border rounded-sm" placeholder="Value">
+
+
+    <button @click="removeExtraInformation(counter)" class="fa-solid fa-circle-minus fa-2xl ml-4"> </button>
+    </div>
+    
+    
+
+    
+ 
+  
+    
+    
+    
+ 
+    
+    
+    
+    
+    </div>
+     <div class="flex flex-row justify-center items-center h-36 mt-10 bg-gray-100">
+      <button @click="addInfo()" class="bg-green-500 w-52 h-16 text-white font-extrabold">Add Information</button>
+    </div>
+    
+</div>
+
+
+<div class="border p-3 w-full mt-3 bg-amber-200" v-if="instructions && instructions.length > 0">
+      <h1 class="mb-3 text-xl">  <u>Instructions</u></h1>
+  <div class="bg-amber-200 px-10">
+     <ol class="list-disc">
+      <li v-for="(instruction, instructionCounter) in instructions" class="text-lg">\{{instruction}}</li>
+      
+    </ol> 
+  </div>
+    
+</div>
+
+<div v-if="requestType === 'custom'" class="mb-3 w-full p-3 border ">
+
+<h1>Approvers</h1>
+
+
+  <div v-for="(approver, approverCounter) in approvers" class="  mb-5 w-full flex flex-row">
+
+
+
+
+    <div  v-bind:id="'approvers' + approverCounter " class="w-full bg-gray-200 pt-4 border border-solid border-black"> 
+
+  <label for="" class="mr-5 ml-5">A\{{approverCounter + 1}} </label>
+ <select name="" id="" v-model="approvers[approverCounter].name" class=" mb-2 h-10 w-5/6  border-solid border-black border">
+  <option value="Requester's Own Department" disabled selected hidden>Approver</option>
+ <option v-for="department in departments" :value="department.email" v-if="department.email != null">
+ \{{department.email}}
+ </option>
+  <option  :value="department.name" v-else>
+ \{{department.name}}
+ </option>
+
+ 
+
+ </select>
+
+ <button @click="removeApprover(approverCounter)" class="ml-5 fa-solid fa-circle-minus fa-2xl"></button>
+</div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row justify-center items-center h-36 mt-10 bg-gray-100"><button @click="addApprover()" class="bg-blue-500 w-52 h-16 text-white font-extrabold">Add Approver</button></div>
+
+</div>
+   
+<div class="flex flex-row justify-end items-end w-full mr-5 mt-10">
+        
+    <button @click="makeRequest()" class="bg-blue-500 w-36   text-white font-bold text-md h-14 mr-3 rounded-sm" v-if="requestType != 'custom'">Make Request</button>
+    <button @click="makeCustomRequest()" class="bg-blue-500 w-36   text-white font-bold text-md h-14 mr-3 rounded-sm" v-else>Make Custom Request</button>
+    
+    
+    <button v-if="userType != 'Admin'" onclick="location.href='/normal'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm "> Home</button>
+    <button v-else onclick="location.href='/admin'" class="bg-gray-300 w-36   text-gray-500 font-bold text-md h-14  rounded-sm "> Home</button>
+    
+    
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+var vm = new Vue({
+    el:"#app",
+    data:{
+      requestType:null,
+      extraInfos:[],   
+      workflows:null,
+      userType:"",
+      infos:[],
+      approvers:[],
+      departments:null,
+      dataType:null,
+      dataTypeExtra:null,
+      files:[],
+      message:"",
+      fileNames:[],
+      instructions:[]
+      
+    },
+   
+    created:function(){
+		this.loadWorkFlows();
+	},
+ 
+
+    methods:{
+         loadWorkFlows(){
+			
+			var vm = this;
+			axios.get("/getWorkFlows").then(function(response){
+			    vm.workflows = response.data.workflows;
+          vm.userType = response.data.userType;
+				console.log(response.data)}
+				
+			).catch(function(error){
+			   console.log(error);
+			});
+
+
+
+         axios.get("/getDepartmentsAndApprovers").then(function(response){
+			    vm.departments = response.data;
+				console.log(response.data)}
+				
+			).catch(function(error){
+			   console.log(error);
+			});
+    },
+    addInfo(){
+        var newInfo = {input:"", dataType:"text", name:""}
+        this.extraInfos.push(newInfo);
+        console.log(newInfo);
+    },
+
+    makeRequest(){
+      var vm = this;
+      
+      var data = new FormData();
+      var infosString = JSON.stringify(this.infos);
+      var extraInfosString = JSON.stringify(this.extraInfos);
+
+      data.append("infos", infosString);
+      data.append("extraInfos", extraInfosString);
+      data.append("requestType", this.requestType);
+      for(let x = 0; x < this.files.length; x++){
+           
+                data.append("file", this.files[x]);
+
+      }
+       var nt = window.notie;
+
+
+
+
+      var requestItem = {requestType:this.requestType, infos:this.infos, extraInfos:this.extraInfos}
+      console.log("this is the request item   ")
+      console.log(requestItem)
+      axios.post("/makeRequest", data,  {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }).then((result)=>{
+        console.log(result)
+        vm.infos = [];
+        vm.requestType = " ";
+        vm.extraInfos = [];
+        vm.files = [];
+             nt.alert({
+  type: "info", // optional, default = 4, enum: [1, 2, 3, 4, 5, 'success', 'warning', 'error', 'info', 'neutral']
+  text: "New Request Made",
+  stay: false, // optional, default = false
+  time: 1, // optional, default = 3, minimum = 1,
+  position: "top"
+})
+      }, (error)=>{
+        console.log(error)
+      })
+    },
+    onChange(event){
+     
+
+
+     if(event.target.value != "custom"){
+      function getIndexFromWorkFlows(workflow){
+        return workflow.name == event.target.value;
+      }
+      console.log(event.target.value);
+      var workflows = this.workflows;
+      console.log(workflows);
+      var result = workflows.findIndex(getIndexFromWorkFlows);
+      console.log("from on change function" + result);
+      this.infos = workflows[result].infos;
+      this.instructions = workflows[result].instructions;
+     }else{
+      console.log("custom");
+      this.infos = [];
+      this.instructions = [];
+      
+     }
+      
+
+    },
+    addApprover(){
+      this.approvers.push({conditions:[{ info: "",
+          logic: "",
+          link: "",
+          compareValue: "",
+          dataType: ""}], name:"Requester's Own Department"})
+    },
+    onChangeApprover(event){
+      
+      console.log("from on change " + event.target.value);
+      function findIndexType(info){
+        return info.label == event.target.value;
+       }
+       var infos = this.extraInfos;
+       var result = infos.findIndex(findIndexType);
+       console.log("this is the result" + result);
+       this.dataTypeExtra =  infos[result].dataType;
+       this.infoCounter = result;
+      
+    },
+  
+    makeCustomRequest(){
+      var vm = this;
+      var requestItem = {requestType:this.requestType, infos:this.infos, extraInfos:this.extraInfos, approvers:this.approvers}
+      var requestItemString = JSON.stringify(requestItem);
+      var data = new FormData();
+      data.append("item", requestItemString);
+      
+
+
+      this.populateFiles(data, this.files);
+      console.log("this is the request item")
+      console.log(requestItem);
+      axios.post("/makeCustomRequest", data, {
+        headers:{
+           "Content-Type": "multipart/form-data",
+        }
+      }).then((result)=>{
+        console.log(result);
+        vm.extraInfos = [];
+        vm.approvers = [];
+        vm.infos = [];
+        vm.requestType = null;
+      }).catch((error)=>{
+        console.log(error)
+      })
+    },
+     wDelete(counter){
+         this.approvers.splice(counter, 1);
+    },
+    uploadFile(event){
+      for(let x=0; x < event.target.files.length; x++){
+        this.files.push(event.target.files[x])
+      }
+    },
+    bindResponse(event, label, counter){
+      console.log("from bind response")
+      var response = {}
+      for(var x=0; x < this.infos[counter].answerList; x++){
+        response[this.infos[counter].answerList[x].label] = ""
+      }
+      response[label] = event.target.value;
+      this.infos[counter].responses.push(response);
+      console.log("final response values");
+      console.log(this.infos[counter].responses)
+
+    },
+    setResponses(counter){
+       var response = {};
+      for(var x=0; x < this.infos[counter].answerList; x++){
+            response[this.infos[counter].answerList[x].label] = ""
+      }
+               this.infos[counter].responses.push(response);
+      },
+      addResponses(counter){
+        console.log("from add response")
+          var response = {};
+      for(var x=0; x < this.infos[counter].answerList.length; x++){
+            response[this.infos[counter].answerList[x].label] = ""
+      }
+            if(this.infos[counter].responses){
+               this.infos[counter].responses.push(response)
+               console.log("Final json");
+               console.log(response)
+            }else{
+              this.$set(this.infos[counter], 'responses', [])
+                this.infos[counter].responses.push(response)
+            }
+      },
+      removeResponses(counter){
+        console.log("from remove responses")
+     
+               this.infos[counter].responses.splice(-1, 1)
+               
+
+      },
+
+      removeExtraInformation(counter){
+        this.extraInfos.splice(counter, 1)
+      },
+
+      removeApprover(approverCounter){
+        this.approvers.splice(approverCounter, 1)
+      },
+
+      removeFile(fileCounter){
+        this.files.splice(fileCounter, 1);
+      },
+      populateFiles(data, filesList){
+        for(let x=0; x < filesList.length; x++){
+          data.append("file", filesList[x])
+        }
+
+      },
+
+      setFile(event, counter){
+   
+       
+        this.infos[counter].input = [];
+        
+        for(let x of event.target.files){
+          this.files.push(x);
+          this.infos[counter].input.push(x.name)
+        }
+
+
+      }
+      
+    }
+
+
+
+    }
+
+)
+
+
+</script>

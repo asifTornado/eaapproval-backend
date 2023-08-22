@@ -1,0 +1,115 @@
+
+
+   {{>rate}}
+
+
+
+
+    <div class="h-auto w-auto  grid md:grid-cols-4 md:grid-rows-1 sm:grid-cols-2 sm:grid-rows-2 gap-2  text-lg mt-20  px-24  py-10 bg-gray-100" id="app">
+    
+    
+    
+ 
+
+    
+
+    
+        <div class="border border-solid border-black hover:cursor-pointer bg-lime-500 w-44 text-center  text-lg text-white font-bold h-32  hover:scale-125" onclick="location.href='/makeRequest'" >Make Requests <div ><i class="fa-solid fa-file-circle-question fa-2xl mt-8"></i></div> </div>
+        
+        <div class="hover:cursor-pointer bg-blue-500 w-44 text-center rounded-sm text-white font-bold h-32   text-lg  border border-solid border-black" onclick="location.href='/myRequests'">My Requests <div ><i class="fa-solid fa-file-export fa-2xl mt-8"></i></div></div>
+        
+        {{getUserType user.userType}}
+
+     
+
+
+
+        </div>
+
+
+
+<script>
+    
+$("document").ready(function(){
+
+    function getRating(number){
+      $('#rating').text(number);
+      var total = 4
+      console.log('event fired')
+      console.log(number)
+          for(let x = 0; x < number; x++){
+              list[x].style.color = "gold"
+            }
+
+          for(let x = total ; x > number - 1; x--){
+            list[x].style.color = "grey"
+          }
+
+
+        };
+
+
+  
+
+
+  $("#submitReview").on('click', function(){
+
+   var text = $("#review").val();
+   var rating = $("#rating").text();
+
+   var data = {
+    text:text,
+    rating:rating
+   }
+
+    axios.post("/submitReview", data).then((result)=>{
+      $("#cancelFeedbackBox").click();
+    })
+  })
+
+
+
+  $("#cancelFeedbackBox").on('click', function(){
+    $('#ratingContainer').fadeOut();
+  })
+
+
+  console.log("document ready")
+var userFeedback = "{{user.gotFeedback}}"
+
+console.log("user feed")
+console.log(userFeedback)
+
+if(!userFeedback){
+  console.log("user feedback")
+   console.log(userFeedback)
+  $('#ratingContainer').css('position', 'fixed').css('display', 'block').animate({
+    top:'100',
+  }, 500)
+
+}
+
+  var star1 = $('#s1')[0];
+  var star2 = $('#s2')[0];
+  var star3 = $('#s3')[0];
+  var star4 = $('#s4')[0];
+  var star5 = $('#s5')[0];
+
+
+  var list = [star1, star2, star3, star4, star5];
+
+   for(let x = 0; x < list.length; x++){
+          list[x].addEventListener('click', function(){
+            getRating(x+1)
+            
+          })
+        }
+
+
+    
+
+
+
+}); 
+
+</script>
